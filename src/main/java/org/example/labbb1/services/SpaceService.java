@@ -37,7 +37,7 @@ public class SpaceService {
     public void addNewSpaceMarine(SpaceMarine spaceMarine){
         spaceRepository.save(spaceMarine);
     }
-
+//hrthrhteh
     public Iterable<SpaceMarine> getAllSpaceMarine(){
         return spaceRepository.findAll();
     }
