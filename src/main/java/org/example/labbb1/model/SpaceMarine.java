@@ -16,18 +16,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class SpaceMarine {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
     private String name;
     @ManyToOne(cascade = CascadeType.REMOVE)
-//    @Column(nullable = false)
     private Coordinates coordinates;
     @Column(nullable = false)
     private LocalDateTime creationDate;
     @ManyToOne
-//    @Column(nullable = false)
     private Chapter chapter;
     private Long health;
 

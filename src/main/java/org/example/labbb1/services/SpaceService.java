@@ -37,7 +37,7 @@ public class SpaceService {
     public void addNewSpaceMarine(SpaceMarine spaceMarine){
         spaceRepository.save(spaceMarine);
     }
-//hrthrhteh
+
     public Iterable<SpaceMarine> getAllSpaceMarine(){
         return spaceRepository.findAll();
     }
@@ -67,6 +67,15 @@ public class SpaceService {
 
     @Transactional
     public void deleteCoord(Long id){
+//        coordinatesRepository.findById(id)
+//                .map(coordinates -> {
+//                    coordinates.getSpaceMarines().forEach(marine -> marine.setCoordinates(null));
+//                    coordinates.getSpaceMarines().clear();
+//                    coordinatesRepository.save(coordinates);
+//                    coordinatesRepository.deleteById(id);
+//                    return coordinates;
+//                });
+
 //        Optional<Coordinates> coord = coordinatesRepository.findById(id);
 ////        Coordinates coord = (Coordinates) coordinates;
 //        List<SpaceMarine> spaceMarines = coord.getSpaceMarines();

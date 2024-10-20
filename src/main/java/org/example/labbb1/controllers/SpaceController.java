@@ -1,6 +1,8 @@
 package org.example.labbb1.controllers;
 
 
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.Json;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.SpaceService;
 import org.example.labbb1.services.UserService;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -32,7 +35,13 @@ public class SpaceController {
 
     @GetMapping("getSpaceMarine")
     public Iterable<SpaceMarine> getAll(){
-        return spaceService.getAllSpaceMarine();
+        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
+        spaceMarines.forEach(spaceMarine -> {
+            spaceMarine.getCoordinates().setSpaceMarines(null);
+            spaceMarine.getChapter().setSpaceMarines(null);
+        });
+
+        return spaceMarines;
     }
 
 
@@ -58,12 +67,29 @@ public class SpaceController {
 
     @GetMapping("/getCoord")
     public Iterable<Coordinates> getAllCoordinates(){
-        return spaceService.getAllCoordinates();
+        Iterable<Coordinates> coords = spaceService.getAllCoordinates();
+        coords.forEach(coordinates -> {
+            coordinates.setSpaceMarines(null);
+        });
+//        JsonArrayBuilder builder = Json.createArrayBuilder();
+//        coords.forEach(coordinates -> {
+//            builder.add(Json.createObjectBuilder()
+//                    .add("id", coordinates.getId())
+//                    .add("x", coordinates.getX())
+//                    .add("y", coordinates.getY()));
+//            });
+//        String result = builder.build().toString();
+
+        return coords;
     }
 
     @GetMapping("/getChapter")
     public Iterable<Chapter> getAllChapters(){
-        return spaceService.getAllChapters();
+        Iterable<Chapter> chapters = spaceService.getAllChapters();
+        chapters.forEach(chapter -> {
+            chapter.setSpaceMarines(null);
+        });
+        return chapters;
     }
 
     @PostMapping("/newCoord")
@@ -93,5 +119,11 @@ public class SpaceController {
         spaceService.deleteCoord(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<?> deleteSpaceMarine(@PathVariable Long id){
+//        spaceService.deleteSpac
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 
 }

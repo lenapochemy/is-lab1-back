@@ -69,15 +69,30 @@
             <artifactId>org.eclipse.persistence.jpa</artifactId>
             <version>5.0.0-B03</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.eclipse.persistence</groupId>-->
+<!--            <artifactId>eclipselink</artifactId>-->
+<!--            <version>4.0.2</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
+            <version>42.7.4</version>
         </dependency>
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.2.0-M1</version>
         </dependency>
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.json</groupId>-->
+<!--            <artifactId>json</artifactId>-->
+<!--            <version>20240303</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
