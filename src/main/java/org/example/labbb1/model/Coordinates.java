@@ -20,8 +20,10 @@ public class Coordinates {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @Column(nullable = false)
     private Integer x;
+
     @Column(nullable = false)
     private Float y;
 

@@ -20,9 +20,12 @@ public class Chapter {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     private String parentLegion;
+
     @CascadeOnDelete
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpaceMarine> spaceMarines;

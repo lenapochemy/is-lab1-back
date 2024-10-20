@@ -47,22 +47,26 @@ public class SpaceController {
 
     @GetMapping("/hello")
     public String getHello(){
-//        Coordinates coord = new Coordinates(2l, 3, 7.0f);
-//        Chapter chapter = new Chapter(2l, "dsdd", "mar");
-//        LocalDateTime dateTime = LocalDateTime.now();
-//        User user = userService.findUserByLogin("ee");
-//        SpaceMarine spaceMarine = new SpaceMarine(1l, "lena", coord, dateTime, chapter, 233l, AstartesCategory.SCOUT, Weapon.BOLTGUN, MeleeWeapon.CHAIN_AXE, user);
-//        spaceService.addNewSpaceMarine(spaceMarine);
         return "Hello";
     }
 
     @PostMapping("/addSpaceMarine")
     public ResponseEntity<?> createNewSpaceMarine(@RequestBody SpaceMarine spaceMarine){
-        spaceMarine.setCreationDate(LocalDateTime.now());
-//        User user = userService.findUserByLogin("ee");
-//        spaceMarine.setUser(user);
-        spaceService.addNewSpaceMarine(spaceMarine);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if (spaceMarine.getName().isEmpty() ||
+                spaceMarine.getCoordinates() == null ||
+                spaceMarine.getChapter() == null ||
+                spaceMarine.getHealth() <= 0 ||
+                spaceMarine.getCategory() == null){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try{
+            spaceMarine.setCreationDate(LocalDateTime.now());
+            spaceService.addNewSpaceMarine(spaceMarine);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PSQLException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @GetMapping("/getCoord")
@@ -71,15 +75,6 @@ public class SpaceController {
         coords.forEach(coordinates -> {
             coordinates.setSpaceMarines(null);
         });
-//        JsonArrayBuilder builder = Json.createArrayBuilder();
-//        coords.forEach(coordinates -> {
-//            builder.add(Json.createObjectBuilder()
-//                    .add("id", coordinates.getId())
-//                    .add("x", coordinates.getX())
-//                    .add("y", coordinates.getY()));
-//            });
-//        String result = builder.build().toString();
-
         return coords;
     }
 
@@ -94,6 +89,9 @@ public class SpaceController {
 
     @PostMapping("/newCoord")
     public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         try {
             spaceService.addNewCoordination(coordinates);
             return new ResponseEntity<>(HttpStatus.OK);
@@ -104,8 +102,15 @@ public class SpaceController {
 
     @PostMapping("/newChapter")
     public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter){
-        spaceService.addNewChapter(chapter);
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(chapter.getName() == null ||chapter.getName().isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            spaceService.addNewChapter(chapter);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PSQLException e){
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
     }
 
     @DeleteMapping("/chapter/{id}")

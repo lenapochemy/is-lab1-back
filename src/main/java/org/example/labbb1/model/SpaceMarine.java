@@ -21,14 +21,19 @@ public class SpaceMarine {
 
     @Column(nullable = false)
     private String name;
+
     @ManyToOne //если убрать каскаде тайп, то можно будет удалять марину, без удаления координат
     private Coordinates coordinates;
+
     @Column(nullable = false)
     private LocalDateTime creationDate;
+
     @ManyToOne //если убрать каскаде тайп, то можно будет удалять марину, без удаления части
     private Chapter chapter;
+
     private Long health;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AstartesCategory category;
 

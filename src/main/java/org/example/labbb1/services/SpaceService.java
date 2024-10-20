@@ -34,7 +34,7 @@ public class SpaceService {
 //        Chapter chapter1 = chapterRepository.
 //    }
 
-    public void addNewSpaceMarine(SpaceMarine spaceMarine){
+    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
         spaceRepository.save(spaceMarine);
     }
 
@@ -46,7 +46,7 @@ public class SpaceService {
         return chapterRepository.findAll();
     }
 
-    public void addNewChapter(Chapter chapter){
+    public void addNewChapter(Chapter chapter) throws PSQLException{
         chapterRepository.save(chapter);
     }
 
