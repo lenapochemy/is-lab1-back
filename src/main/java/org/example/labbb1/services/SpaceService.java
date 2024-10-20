@@ -65,7 +65,7 @@ public class SpaceService {
     }
 
 
-    @Transactional
+//    @Transactional
     public void deleteCoord(Long id){
 //        coordinatesRepository.findById(id)
 //                .map(coordinates -> {
@@ -91,4 +91,8 @@ public class SpaceService {
         coordinatesRepository.deleteById(id);
     }
 
+
+    public void deleteSpaceMarine(Long id){
+        spaceRepository.deleteById(id);
+    }
 }

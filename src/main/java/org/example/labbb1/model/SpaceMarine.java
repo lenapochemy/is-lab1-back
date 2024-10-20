@@ -21,11 +21,11 @@ public class SpaceMarine {
 
     @Column(nullable = false)
     private String name;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne //если убрать каскаде тайп, то можно будет удалять марину, без удаления координат
     private Coordinates coordinates;
     @Column(nullable = false)
     private LocalDateTime creationDate;
-    @ManyToOne
+    @ManyToOne //если убрать каскаде тайп, то можно будет удалять марину, без удаления части
     private Chapter chapter;
     private Long health;
 

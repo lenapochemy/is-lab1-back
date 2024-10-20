@@ -120,10 +120,10 @@ public class SpaceController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteSpaceMarine(@PathVariable Long id){
-//        spaceService.deleteSpac
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteSpaceMarine(@PathVariable Long id){
+        spaceService.deleteSpaceMarine(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
