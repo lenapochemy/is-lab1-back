@@ -103,6 +103,18 @@ public class SpaceService {
         return chapterRepository.findAll(pageable);
     }
 
+    public Iterable<Chapter> getPageChapterByName(String sortParam, int page, String name){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return chapterRepository.findAllByName(pageable, name);
+    }
+
+    public Iterable<Chapter> getPageChapterByParentLegion(String sortParam, int page, String parentLegion){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return chapterRepository.findAllByParentLegion(pageable, parentLegion);
+    }
+
     public void deleteChapter(Long id){
 //        Chapter chapter = new Chapter();
 //        chapter.setId(id);

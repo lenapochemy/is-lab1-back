@@ -112,6 +112,24 @@ public class SpaceController {
         return chapters;
     }
 
+    @GetMapping("/getChapterByName/{name}/{sort}/{page}")
+    public Iterable<Chapter> getChaptersByName(@PathVariable String name, @PathVariable String sort, @PathVariable int page){
+        Iterable<Chapter> chapters = spaceService.getPageChapterByName(sort, page, name);
+        chapters.forEach(chapter -> {
+            chapter.setSpaceMarines(null);
+        });
+        return chapters;
+    }
+
+    @GetMapping("/getChapterByParentLegion/{parentLegion}/{sort}/{page}")
+    public Iterable<Chapter> getChaptersByparentlegion(@PathVariable String parentLegion, @PathVariable String sort, @PathVariable int page){
+        Iterable<Chapter> chapters = spaceService.getPageChapterByParentLegion(sort, page, parentLegion);
+        chapters.forEach(chapter -> {
+            chapter.setSpaceMarines(null);
+        });
+        return chapters;
+    }
+
     @PostMapping("/updateCoord")
     public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
         Coordinates coordinates1 = spaceService.getCoordById(coordinates.getId());
