@@ -32,19 +32,6 @@ public class SpaceController {
         this.userService = userService;
     }
 
-
-    @GetMapping("getSpaceMarine")
-    public Iterable<SpaceMarine> getAll(){
-        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
-        spaceMarines.forEach(spaceMarine -> {
-            spaceMarine.getCoordinates().setSpaceMarines(null);
-            spaceMarine.getChapter().setSpaceMarines(null);
-        });
-
-        return spaceMarines;
-    }
-
-
     @GetMapping("/hello")
     public String getHello(){
         return "Hello";
@@ -69,6 +56,44 @@ public class SpaceController {
 
     }
 
+    @PostMapping("/newCoord")
+    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            spaceService.updateCoordinate(coordinates);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PSQLException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+    @PostMapping("/newChapter")
+    public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter){
+        if(chapter.getName() == null ||chapter.getName().isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try {
+            spaceService.addNewChapter(chapter);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PSQLException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("getSpaceMarine")
+    public Iterable<SpaceMarine> getAll(){
+        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
+        spaceMarines.forEach(spaceMarine -> {
+            spaceMarine.getCoordinates().setSpaceMarines(null);
+            spaceMarine.getChapter().setSpaceMarines(null);
+        });
+
+        return spaceMarines;
+    }
+
     @GetMapping("/getCoord")
     public Iterable<Coordinates> getAllCoordinates(){
         Iterable<Coordinates> coords = spaceService.getAllCoordinates();
@@ -87,31 +112,55 @@ public class SpaceController {
         return chapters;
     }
 
-    @PostMapping("/newCoord")
-    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
-        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
+    @PostMapping("/updateCoord")
+    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
+        Coordinates coordinates1 = spaceService.getCoordById(coordinates.getId());
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147 || coordinates1 == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            spaceService.addNewCoordination(coordinates);
+            spaceService.updateCoordinate(coordinates);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
-    @PostMapping("/newChapter")
-    public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter){
-        if(chapter.getName() == null ||chapter.getName().isEmpty()){
+    @PostMapping("/updateChapter")
+    public ResponseEntity<?> updateChapter(@RequestBody Chapter chapter){
+        Chapter chapter1 = spaceService.getChapterById(chapter.getId());
+        if(chapter.getName() == null ||chapter.getName().isEmpty() || chapter1 == null
+        ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            spaceService.addNewChapter(chapter);
+            spaceService.updateChapter(chapter);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (PSQLException e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/updateSpaceMarine")
+    public ResponseEntity<?> updateSpaceMarine(@RequestBody SpaceMarine spaceMarine){
+        SpaceMarine spaceMarine1 = spaceService.getSpaceMarine(spaceMarine.getId());
+        if (spaceMarine.getName().isEmpty() ||
+                spaceMarine.getCoordinates() == null ||
+                spaceMarine.getChapter() == null ||
+                spaceMarine.getHealth() <= 0 ||
+                spaceMarine.getCategory() == null || spaceMarine1 == null
+                ){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        try{
+            spaceMarine.setCreationDate(LocalDateTime.now());
+            spaceService.updateSpaceMarine(spaceMarine);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e){
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
-    }
+
 
     @DeleteMapping("/chapter/{id}")
     public ResponseEntity<?> deleteChapter(@PathVariable Long id){
@@ -130,5 +179,7 @@ public class SpaceController {
         spaceService.deleteSpaceMarine(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
 
 }

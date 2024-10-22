@@ -38,6 +38,30 @@ public class SpaceService {
         spaceRepository.save(spaceMarine);
     }
 
+    public void updateSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
+        spaceRepository.save(spaceMarine);
+    }
+    public Coordinates getCoordById(long id){
+        return coordinatesRepository.findById(id);
+    }
+
+    public Chapter getChapterById(Long id){
+        var chapt =  chapterRepository.findById(id);
+        Chapter chapter = null;
+        if(chapt.isPresent()){
+            chapter = chapt.get();
+        }
+        return chapter;
+    }
+
+    public SpaceMarine getSpaceMarine(Long id){
+        var marine = spaceRepository.findById(id);
+        SpaceMarine spaceMarine = null;
+        if(marine.isPresent()){
+            spaceMarine = marine.get();
+        }
+        return spaceMarine;
+    }
     public Iterable<SpaceMarine> getAllSpaceMarine(){
         return spaceRepository.findAll();
     }
@@ -49,8 +73,17 @@ public class SpaceService {
     public void addNewChapter(Chapter chapter) throws PSQLException{
         chapterRepository.save(chapter);
     }
+    public void updateChapter(Chapter chapter) throws PSQLException{
+        chapterRepository.save(chapter);
+    }
 
-    public void addNewCoordination(Coordinates coordinates) throws PSQLException {
+
+    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
+        coordinatesRepository.save(coordinates);
+    }
+
+    public void updateCoordinate(Coordinates coordinates) throws PSQLException{
+//        Coordinates oldCoord = coordinatesRepository.findById(coordinates.getId());
         coordinatesRepository.save(coordinates);
     }
 
@@ -67,27 +100,6 @@ public class SpaceService {
 
 //    @Transactional
     public void deleteCoord(Long id){
-//        coordinatesRepository.findById(id)
-//                .map(coordinates -> {
-//                    coordinates.getSpaceMarines().forEach(marine -> marine.setCoordinates(null));
-//                    coordinates.getSpaceMarines().clear();
-//                    coordinatesRepository.save(coordinates);
-//                    coordinatesRepository.deleteById(id);
-//                    return coordinates;
-//                });
-
-//        Optional<Coordinates> coord = coordinatesRepository.findById(id);
-////        Coordinates coord = (Coordinates) coordinates;
-//        List<SpaceMarine> spaceMarines = coord.getSpaceMarines();
-//        spaceRepository.deleteAll(spaceMarines);
-//        for(SpaceMarine marine : spaceMarines){
-//            coord.removeSpaceMarine(marine);
-//        }
-//        Coordinates coordinates = coordinatesRepository.findById(id);
-//
-//        coordinates.getSpaceMarines().forEach(spaceMarine -> {
-//            spaceMarine.getCoordinates().remove(coordinates);
-//        });
         coordinatesRepository.deleteById(id);
     }
 
@@ -95,4 +107,7 @@ public class SpaceService {
     public void deleteSpaceMarine(Long id){
         spaceRepository.deleteById(id);
     }
+
+
+
 }
