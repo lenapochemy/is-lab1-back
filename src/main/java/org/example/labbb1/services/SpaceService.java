@@ -10,6 +10,10 @@ import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
@@ -30,9 +34,6 @@ public class SpaceService {
         this.coordinatesRepository = coordinatesRepository;
     }
 
-//    public Chapter findOrAddNewChapter(Chapter chapter){
-//        Chapter chapter1 = chapterRepository.
-//    }
 
     public void addNewSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
         spaceRepository.save(spaceMarine);
@@ -62,13 +63,7 @@ public class SpaceService {
         }
         return spaceMarine;
     }
-    public Iterable<SpaceMarine> getAllSpaceMarine(){
-        return spaceRepository.findAll();
-    }
 
-    public Iterable<Chapter> getAllChapters(){
-        return chapterRepository.findAll();
-    }
 
     public void addNewChapter(Chapter chapter) throws PSQLException{
         chapterRepository.save(chapter);
@@ -87,8 +82,25 @@ public class SpaceService {
         coordinatesRepository.save(coordinates);
     }
 
-    public Iterable<Coordinates> getAllCoordinates(){
-        return coordinatesRepository.findAll();
+    public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return spaceRepository.findAll(pageable);
+    }
+
+    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
+        if(sortParam == null){
+            sortParam = "id";
+        }
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return coordinatesRepository.findAll(pageable);
+    }
+
+    public Iterable<Chapter> getPageChapters(String sortParam, int page){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return chapterRepository.findAll(pageable);
     }
 
     public void deleteChapter(Long id){

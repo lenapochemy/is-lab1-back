@@ -9,7 +9,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
-@SuppressWarnings("ALL")
 @Repository
 public interface SpaceRepository extends CrudRepository<SpaceMarine, Long>, PagingAndSortingRepository<SpaceMarine, Long> {
 

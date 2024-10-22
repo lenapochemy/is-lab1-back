@@ -62,7 +62,7 @@ public class SpaceController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
-            spaceService.updateCoordinate(coordinates);
+            spaceService.addNewCoordinate(coordinates);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -83,9 +83,9 @@ public class SpaceController {
         }
     }
 
-    @GetMapping("getSpaceMarine")
-    public Iterable<SpaceMarine> getAll(){
-        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
+    @GetMapping("getSpaceMarine/{sort}/{page}")
+    public Iterable<SpaceMarine> getPageSpaceMarine(@PathVariable String sort, @PathVariable int page){
+        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarine(sort, page);
         spaceMarines.forEach(spaceMarine -> {
             spaceMarine.getCoordinates().setSpaceMarines(null);
             spaceMarine.getChapter().setSpaceMarines(null);
@@ -94,18 +94,18 @@ public class SpaceController {
         return spaceMarines;
     }
 
-    @GetMapping("/getCoord")
-    public Iterable<Coordinates> getAllCoordinates(){
-        Iterable<Coordinates> coords = spaceService.getAllCoordinates();
+    @GetMapping("/getCoord/{sort}/{page}")
+    public Iterable<Coordinates> getCoordinates(@PathVariable String sort, @PathVariable int page){
+        Iterable<Coordinates> coords = spaceService.getPageCoordinates(sort, page);
         coords.forEach(coordinates -> {
             coordinates.setSpaceMarines(null);
         });
         return coords;
     }
 
-    @GetMapping("/getChapter")
-    public Iterable<Chapter> getAllChapters(){
-        Iterable<Chapter> chapters = spaceService.getAllChapters();
+    @GetMapping("/getChapter/{sort}/{page}")
+    public Iterable<Chapter> getChapters(@PathVariable String sort, @PathVariable int page){
+        Iterable<Chapter> chapters = spaceService.getPageChapters(sort, page);
         chapters.forEach(chapter -> {
             chapter.setSpaceMarines(null);
         });
