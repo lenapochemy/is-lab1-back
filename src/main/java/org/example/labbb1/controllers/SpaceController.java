@@ -58,7 +58,6 @@ public class SpaceController {
         } catch (PSQLException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @GetMapping("/{sort}/{page}")

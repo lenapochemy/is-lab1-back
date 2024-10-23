@@ -33,6 +33,10 @@ public class CoordinatesService {
     }
 
 
+    public Iterable<Coordinates> getAllCoordinates(){
+        return coordinatesRepository.findAll();
+    }
+
     public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);

@@ -48,6 +48,15 @@ public class ChapterController {
         }
     }
 
+    @GetMapping()
+    public Iterable<Chapter> getAllChapters(){
+        Iterable<Chapter> chapters = chapterService.getAllChapters();
+        chapters.forEach(chapter -> {
+            chapter.setSpaceMarines(null);
+        });
+        return chapters;
+    }
+
     @GetMapping("/{sort}/{page}")
     public Iterable<Chapter> getChapters(@PathVariable String sort, @PathVariable int page){
         Iterable<Chapter> chapters = chapterService.getPageChapters(sort, page);

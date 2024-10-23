@@ -34,6 +34,16 @@ public class CoordinatesController {
         }
     }
 
+
+    @GetMapping()
+    public Iterable<Coordinates> getAllCoordinates(){
+        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates();
+        coords.forEach(coordinates -> {
+            coordinates.setSpaceMarines(null);
+        });
+        return coords;
+    }
+
     @GetMapping("/{sort}/{page}")
     public Iterable<Coordinates> getCoordinates(@PathVariable String sort, @PathVariable int page){
         Iterable<Coordinates> coords = coordinatesService.getPageCoordinates(sort, page);

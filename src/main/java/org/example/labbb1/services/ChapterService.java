@@ -38,6 +38,9 @@ public class ChapterService {
         chapterRepository.save(chapter);
     }
 
+    public Iterable<Chapter> getAllChapters(){
+        return chapterRepository.findAll();
+    }
     public Iterable<Chapter> getPageChapters(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);

@@ -42,7 +42,6 @@ public class SpaceService {
     }
 
 
-
     public SpaceMarine getSpaceMarine(Long id){
         var marine = spaceRepository.findById(id);
         SpaceMarine spaceMarine = null;
@@ -52,16 +51,6 @@ public class SpaceService {
         return spaceMarine;
     }
 
-
-
-//    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
-//        coordinatesRepository.save(coordinates);
-//    }
-//
-//    public void updateCoordinate(Coordinates coordinates) throws PSQLException{
-////        Coordinates oldCoord = coordinatesRepository.findById(coordinates.getId());
-//        coordinatesRepository.save(coordinates);
-//    }
 
     public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
