@@ -1,10 +1,7 @@
 package org.example.labbb1.services;
 
 import jakarta.transaction.Transactional;
-import org.example.labbb1.model.Chapter;
-import org.example.labbb1.model.Coordinates;
-import org.example.labbb1.model.SpaceMarine;
-import org.example.labbb1.model.User;
+import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.SpaceRepository;
@@ -16,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -24,14 +22,14 @@ import java.util.Optional;
 public class SpaceService {
 
     private final SpaceRepository spaceRepository;
-    private final ChapterRepository chapterRepository;
-    private final CoordinatesRepository coordinatesRepository;
+//    private final ChapterRepository chapterRepository;
+//    private final CoordinatesRepository coordinatesRepository;
 
     @Autowired
     public SpaceService(SpaceRepository spaceRepository, ChapterRepository chapterRepository, CoordinatesRepository coordinatesRepository){
         this.spaceRepository = spaceRepository;
-        this.chapterRepository = chapterRepository;
-        this.coordinatesRepository = coordinatesRepository;
+//        this.chapterRepository = chapterRepository;
+//        this.coordinatesRepository = coordinatesRepository;
     }
 
 
@@ -42,18 +40,8 @@ public class SpaceService {
     public void updateSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
         spaceRepository.save(spaceMarine);
     }
-    public Coordinates getCoordById(long id){
-        return coordinatesRepository.findById(id);
-    }
 
-    public Chapter getChapterById(Long id){
-        var chapt =  chapterRepository.findById(id);
-        Chapter chapter = null;
-        if(chapt.isPresent()){
-            chapter = chapt.get();
-        }
-        return chapter;
-    }
+
 
     public SpaceMarine getSpaceMarine(Long id){
         var marine = spaceRepository.findById(id);
@@ -65,22 +53,15 @@ public class SpaceService {
     }
 
 
-    public void addNewChapter(Chapter chapter) throws PSQLException{
-        chapterRepository.save(chapter);
-    }
-    public void updateChapter(Chapter chapter) throws PSQLException{
-        chapterRepository.save(chapter);
-    }
 
-
-    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
-        coordinatesRepository.save(coordinates);
-    }
-
-    public void updateCoordinate(Coordinates coordinates) throws PSQLException{
-//        Coordinates oldCoord = coordinatesRepository.findById(coordinates.getId());
-        coordinatesRepository.save(coordinates);
-    }
+//    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
+//        coordinatesRepository.save(coordinates);
+//    }
+//
+//    public void updateCoordinate(Coordinates coordinates) throws PSQLException{
+////        Coordinates oldCoord = coordinatesRepository.findById(coordinates.getId());
+//        coordinatesRepository.save(coordinates);
+//    }
 
     public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
@@ -88,44 +69,73 @@ public class SpaceService {
         return spaceRepository.findAll(pageable);
     }
 
-    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
-        if(sortParam == null){
-            sortParam = "id";
-        }
+    public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);
-        return coordinatesRepository.findAll(pageable);
+        return spaceRepository.findAllByName(pageable, name);
     }
 
-    public Iterable<Chapter> getPageChapters(String sortParam, int page){
+    public Iterable<SpaceMarine> getPageSpaceMarineByCoordinates(String sortParam, int page, Coordinates coordinates){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);
-        return chapterRepository.findAll(pageable);
+        return spaceRepository.findAllByCoordinates(pageable, coordinates);
     }
-
-    public Iterable<Chapter> getPageChapterByName(String sortParam, int page, String name){
+    public Iterable<SpaceMarine> getPageSpaceMarineByCreationDate(String sortParam, int page, LocalDateTime creationDate){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);
-        return chapterRepository.findAllByName(pageable, name);
+        return spaceRepository.findAllByCreationDate(pageable, creationDate);
     }
 
-    public Iterable<Chapter> getPageChapterByParentLegion(String sortParam, int page, String parentLegion){
+    public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, Chapter chapter){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);
-        return chapterRepository.findAllByParentLegion(pageable, parentLegion);
+        return spaceRepository.findAllByChapter(pageable, chapter);
     }
 
-    public void deleteChapter(Long id){
-//        Chapter chapter = new Chapter();
-//        chapter.setId(id);
-        chapterRepository.deleteById(id);
+    public Iterable<SpaceMarine> getPageSpaceMarineByHealth(String sortParam, int page, Long health){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return spaceRepository.findAllByHealth(pageable, health);
     }
 
+    public Iterable<SpaceMarine> getPageSpaceMarineByCategory(String sortParam, int page, AstartesCategory category){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return spaceRepository.findAllByCategory(pageable, category);
+    }
 
+    public Iterable<SpaceMarine> getPageSpaceMarineByWeaponType(String sortParam, int page, Weapon weaponType){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return spaceRepository.findAllByWeaponType(pageable, weaponType);
+    }
+    public Iterable<SpaceMarine> getPageSpaceMarineByMeleeWeapon(String sortParam, int page, MeleeWeapon meleeWeapon){
+        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+        Pageable pageable = PageRequest.of(page, 10, sort);
+        return spaceRepository.findAllByMeleeWeapon(pageable, meleeWeapon);
+    }
+
+//    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return coordinatesRepository.findAll(pageable);
+//    }
+//
+//    public Iterable<Coordinates> getPageCoordinatesByX(String sortParam, int page, Integer x){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return coordinatesRepository.findAllByX(pageable, x);
+//    }
+//
+//    public Iterable<Coordinates> getPageCoordinatesByY(String sortParam, int page, Float y){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return coordinatesRepository.findAllByY(pageable, y);
+//    }
 //    @Transactional
-    public void deleteCoord(Long id){
-        coordinatesRepository.deleteById(id);
-    }
+//    public void deleteCoord(Long id){
+//        coordinatesRepository.deleteById(id);
+//    }
 
 
     public void deleteSpaceMarine(Long id){
