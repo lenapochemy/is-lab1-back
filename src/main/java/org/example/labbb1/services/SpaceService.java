@@ -1,6 +1,7 @@
 package org.example.labbb1.services;
 
 import jakarta.transaction.Transactional;
+import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.CoordinatesRepository;
@@ -37,8 +38,15 @@ public class SpaceService {
         spaceRepository.save(spaceMarine);
     }
 
-    public void updateSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
-        spaceRepository.save(spaceMarine);
+    public boolean updateSpaceMarine(SpaceMarine spaceMarine, User user) throws PSQLException, ForbiddenException{
+        var marine = spaceRepository.findById(spaceMarine.getId());
+        if(marine.isPresent()){
+            SpaceMarine spaceMarine1 = marine.get();
+            if(spaceMarine1.getUser().getId().equals(user.getId())){
+                spaceRepository.save(spaceMarine);
+                return true;
+            } else throw new ForbiddenException();
+        } else return false;
     }
 
 
@@ -104,31 +112,15 @@ public class SpaceService {
         return spaceRepository.findAllByMeleeWeapon(pageable, meleeWeapon);
     }
 
-//    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return coordinatesRepository.findAll(pageable);
-//    }
-//
-//    public Iterable<Coordinates> getPageCoordinatesByX(String sortParam, int page, Integer x){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return coordinatesRepository.findAllByX(pageable, x);
-//    }
-//
-//    public Iterable<Coordinates> getPageCoordinatesByY(String sortParam, int page, Float y){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return coordinatesRepository.findAllByY(pageable, y);
-//    }
-//    @Transactional
-//    public void deleteCoord(Long id){
-//        coordinatesRepository.deleteById(id);
-//    }
-
-
-    public void deleteSpaceMarine(Long id){
-        spaceRepository.deleteById(id);
+    public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException{
+        var marine = spaceRepository.findById(id);
+        if(marine.isPresent()){
+            SpaceMarine spaceMarine1 = marine.get();
+            if(spaceMarine1.getUser().getId().equals(user.getId())){
+                spaceRepository.deleteById(id);
+                return true;
+            } else throw new ForbiddenException();
+        } else return false;
     }
 
 

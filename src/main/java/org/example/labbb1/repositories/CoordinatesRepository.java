@@ -1,6 +1,7 @@
 package org.example.labbb1.repositories;
 
 import org.example.labbb1.model.Coordinates;
+import org.example.labbb1.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,5 +19,5 @@ public interface CoordinatesRepository extends PagingAndSortingRepository<Coordi
 
     Page<Coordinates> findAllByX(Pageable pageable, Integer x);
     Page<Coordinates> findAllByY(Pageable pageable, Float y);
-
+    Page<Coordinates> findAllByUser(Pageable pageable, User user);
 }

@@ -18,12 +18,20 @@ public class User{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
+
     @Column(unique = true, nullable = false)
     private String login;
+
     @Column(unique = true, nullable = false)
     private String password;
 
-//    @OneToMany(mappedBy = "user")
-//    private List<SpaceMarine> spaceMarines;
+    @OneToMany(mappedBy = "user")
+    private List<Coordinates> coordinates;
+
+    @OneToMany(mappedBy = "user")
+    private List<Chapter> chapters;
+
+    @OneToMany(mappedBy = "user")
+    private List<SpaceMarine> spaceMarines;
 
 }

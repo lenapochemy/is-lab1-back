@@ -27,6 +27,9 @@ public class Coordinates {
     @Column(nullable = false)
     private Float y;
 
+    @ManyToOne
+    private User user;
+
     @CascadeOnDelete
     @OneToMany(mappedBy = "coordinates", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpaceMarine> spaceMarines;

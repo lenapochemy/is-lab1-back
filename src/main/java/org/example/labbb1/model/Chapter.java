@@ -29,4 +29,7 @@ public class Chapter {
     @CascadeOnDelete
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpaceMarine> spaceMarines;
+
+    @ManyToOne
+    private User user;
 }

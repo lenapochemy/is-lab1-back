@@ -43,8 +43,7 @@ public class SpaceMarine {
     @Enumerated(EnumType.STRING)
     private MeleeWeapon meleeWeapon;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id", referencedColumnName = "id")
-//    private User user;
+    @ManyToOne
+    private User user;
 
 }

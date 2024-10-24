@@ -1,6 +1,8 @@
 package org.example.labbb1.services;
 
+import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Coordinates;
+import org.example.labbb1.model.User;
 import org.example.labbb1.repositories.CoordinatesRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +29,15 @@ public class CoordinatesService {
         coordinatesRepository.save(coordinates);
     }
 
-    public void updateCoordinate(Coordinates coordinates) throws PSQLException{
-//        Coordinates oldCoord = coordinatesRepository.findById(coordinates.getId());
-        coordinatesRepository.save(coordinates);
+    public boolean updateCoordinate(Coordinates coordinates, User user) throws PSQLException, ForbiddenException{
+        var coord = coordinatesRepository.findById(coordinates.getId());
+        if(coord.isPresent()) {
+            Coordinates coordinates1 = coord.get();
+            if(coordinates1.getUser().getId().equals(user.getId())) {
+                coordinatesRepository.save(coordinates);
+                return true;
+            } else throw new ForbiddenException();
+        } else return false;
     }
 
 
@@ -55,8 +63,15 @@ public class CoordinatesService {
         return coordinatesRepository.findAllByY(pageable, y);
     }
 
-    public void deleteCoord(Long id){
-        coordinatesRepository.deleteById(id);
+    public boolean deleteCoord(Long id, User user) throws ForbiddenException{
+        var coord = coordinatesRepository.findById(id);
+        if(coord.isPresent()) {
+            Coordinates coordinates = coord.get();
+            if(coordinates.getUser().getId().equals(user.getId())) {
+                coordinatesRepository.deleteById(id);
+                return true;
+            } else throw new ForbiddenException();
+        } else return false;
     }
 
 }
