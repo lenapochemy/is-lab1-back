@@ -17,6 +17,7 @@ public interface SpaceRepository extends CrudRepository<SpaceMarine, Long>, Pagi
     Page<SpaceMarine> findAll (Pageable pageable);
 //    SpaceMarine findById(Long id);
 
+    Iterable<SpaceMarine> findAllByUser(User user);
     Page<SpaceMarine> findAllByName(Pageable pageable, String name);
     Page<SpaceMarine> findAllByCoordinates(Pageable pageable, Coordinates coordinates);
     Page<SpaceMarine> findAllByCreationDate(Pageable pageable, LocalDateTime creationDate);

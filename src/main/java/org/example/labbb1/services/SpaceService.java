@@ -68,6 +68,10 @@ public class SpaceService {
         return spaceRepository.findAll(pageable);
     }
 
+    public Iterable<SpaceMarine> getAllSpaceMarine(User user){
+        return spaceRepository.findAllByUser(user);
+    }
+
     public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, 10, sort);

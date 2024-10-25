@@ -68,6 +68,20 @@ public class SpaceController {
         }
     }
 
+    @GetMapping()
+    public ResponseEntity<?> getAllSpaceMarine(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if( token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        User user = userService.findUserByToken(token);
+        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine(user);
+        attributeToNull(spaceMarines);
+        return ResponseEntity.ok(spaceMarines);
+    }
+
     @GetMapping("/{sort}/{page}")
     public ResponseEntity<?> getPageSpaceMarine(@PathVariable String sort, @PathVariable Integer page,
                                                     @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
@@ -78,15 +92,6 @@ public class SpaceController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarine(sort, page);
-//        spaceMarines.forEach(spaceMarine -> {
-//            spaceMarine.getCoordinates().setSpaceMarines(null);
-//            spaceMarine.getChapter().setSpaceMarines(null);
-//            spaceMarine.getUser().setChapters(null);
-//            spaceMarine.getUser().setCoordinates(null);
-//            spaceMarine.getUser().setSpaceMarines(null);
-//            spaceMarine.getUser().setId(null);
-//            spaceMarine.getUser().setPassword(null);
-//        });
         attributeToNull(spaceMarines);
         return ResponseEntity.ok(spaceMarines);
     }
