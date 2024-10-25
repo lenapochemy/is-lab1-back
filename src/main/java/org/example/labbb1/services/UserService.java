@@ -3,6 +3,7 @@ package org.example.labbb1.services;
 
 import org.example.labbb1.exceptions.AlreadyAdminException;
 import org.example.labbb1.exceptions.BadRequestException;
+import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.UserRepository;
@@ -60,10 +61,14 @@ public class UserService {
     }
 
     public User findUserByToken(String token){
+        System.out.println(7);
         Integer id =  tokenHasher.userIdDecodeToken(token);
         var user = userRepository.findById(id);
         if(user.isPresent()){
-            return user.get();
+            System.out.println(8);
+            User user1 =  user.get();
+            System.out.println(user1.getId() + " " + user1.getLogin() + " " + user1.getRole());
+            return user1;
         } else return null;
     }
 
@@ -103,6 +108,21 @@ public class UserService {
             }
         }
         throw new BadRequestException();
+    }
+
+    public void approveAdmin(Integer id, String token) throws ForbiddenException, BadRequestException{
+        if(getRoleByToken(token).equals(UserRole.APPROVED_ADMIN)){
+            var us = userRepository.findById(id);
+            if(us.isPresent()){
+                User user = us.get();
+                user.setRole(UserRole.APPROVED_ADMIN);
+                userRepository.save(user);
+            } else throw new BadRequestException();
+        } else throw new ForbiddenException();
+    }
+
+    public List<User> getWaitingAdmins(){
+        return userRepository.findAllByRole(UserRole.WAITING_ADMIN);
     }
 
 //    @Override

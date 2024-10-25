@@ -2,6 +2,7 @@ package org.example.labbb1.controllers;
 
 import org.example.labbb1.exceptions.AlreadyAdminException;
 import org.example.labbb1.exceptions.BadRequestException;
+import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
 import org.example.labbb1.services.UserService;
@@ -12,6 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -85,5 +88,44 @@ public class UserController {
         }
     }
 
+    @PostMapping("/admin/approve/{id}")
+    public ResponseEntity<?> approveAdmin(@PathVariable Integer id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if(id == null || token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        try{
+            userService.approveAdmin(id, token);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (BadRequestException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (ForbiddenException e){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+    }
 
+    @GetMapping("/admin")
+    public ResponseEntity<?> getWaitingAdmins(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if(token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        List<User> users = userService.getWaitingAdmins();
+        attributeToNull(users);
+        return ResponseEntity.ok(users);
+    }
+
+
+    private void attributeToNull(List<User> users){
+        users.forEach(user -> {
+            user.setPassword(null);
+            user.setSpaceMarines(null);
+            user.setChapters(null);
+            user.setCoordinates(null);
+        });
+    }
 }
