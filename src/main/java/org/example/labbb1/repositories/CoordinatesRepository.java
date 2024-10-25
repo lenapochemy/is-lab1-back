@@ -9,6 +9,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 
 @Repository
 public interface CoordinatesRepository extends PagingAndSortingRepository<Coordinates, Long>, CrudRepository<Coordinates, Long> {
@@ -19,5 +21,5 @@ public interface CoordinatesRepository extends PagingAndSortingRepository<Coordi
 
     Page<Coordinates> findAllByX(Pageable pageable, Integer x);
     Page<Coordinates> findAllByY(Pageable pageable, Float y);
-    Page<Coordinates> findAllByUser(Pageable pageable, User user);
+    List<Coordinates> findAllByUser(User user);
 }

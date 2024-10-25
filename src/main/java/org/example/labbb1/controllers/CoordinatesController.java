@@ -58,7 +58,8 @@ public class CoordinatesController {
         if(!userService.verifyToken(token)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates();
+        User user = userService.findUserByToken(token);
+        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates(user);
         attributeToNull(coords);
         return ResponseEntity.ok(coords);
     }

@@ -77,7 +77,8 @@ public class ChapterController {
         if(!userService.verifyToken(token)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        Iterable<Chapter> chapters = chapterService.getAllChapters();
+        User user = userService.findUserByToken(token);
+        Iterable<Chapter> chapters = chapterService.getAllChapters(user);
         attributeToNull(chapters);
         return ResponseEntity.ok(chapters);
     }

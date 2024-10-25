@@ -43,8 +43,8 @@ public class CoordinatesService {
     }
 
 
-    public Iterable<Coordinates> getAllCoordinates(){
-        return coordinatesRepository.findAll();
+    public Iterable<Coordinates> getAllCoordinates(User user){
+        return coordinatesRepository.findAllByUser(user);
     }
 
     public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){

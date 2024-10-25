@@ -49,8 +49,8 @@ public class ChapterService {
         } else return false;
     }
 
-    public Iterable<Chapter> getAllChapters(){
-        return chapterRepository.findAll();
+    public Iterable<Chapter> getAllChapters(User user){
+        return chapterRepository.findAllByUser(user);
     }
     public Iterable<Chapter> getPageChapters(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
