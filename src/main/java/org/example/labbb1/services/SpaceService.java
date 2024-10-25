@@ -42,7 +42,9 @@ public class SpaceService {
         var marine = spaceRepository.findById(spaceMarine.getId());
         if(marine.isPresent()){
             SpaceMarine spaceMarine1 = marine.get();
-            if(spaceMarine1.getUser().getId().equals(user.getId())){
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    spaceMarine1.getUser().getId().equals(user.getId())){
+                spaceMarine.setUser(spaceMarine1.getUser());
                 spaceRepository.save(spaceMarine);
                 return true;
             } else throw new ForbiddenException();
@@ -116,7 +118,8 @@ public class SpaceService {
         var marine = spaceRepository.findById(id);
         if(marine.isPresent()){
             SpaceMarine spaceMarine1 = marine.get();
-            if(spaceMarine1.getUser().getId().equals(user.getId())){
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    spaceMarine1.getUser().getId().equals(user.getId())){
                 spaceRepository.deleteById(id);
                 return true;
             } else throw new ForbiddenException();

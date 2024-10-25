@@ -1,13 +1,19 @@
 package org.example.labbb1.services;
 
 
+import org.example.labbb1.exceptions.AlreadyAdminException;
+import org.example.labbb1.exceptions.BadRequestException;
 import org.example.labbb1.model.User;
+import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.UserRepository;
 import org.example.labbb1.utils.PasswordHasher;
 import org.example.labbb1.utils.TokenHasher;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.management.BadAttributeValueExpException;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -28,7 +34,8 @@ public class UserService {
         if(user1 != null){
             return false;
         }
-            user.setPassword(passwordHasher.hashPassword(user.getPassword()));
+        user.setPassword(passwordHasher.hashPassword(user.getPassword()));
+        user.setRole(UserRole.USER);
 //        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         userRepository.save(user);
         return true;
@@ -53,7 +60,49 @@ public class UserService {
     }
 
     public User findUserByToken(String token){
-        return tokenHasher.decodeToken(token);
+        Integer id =  tokenHasher.userIdDecodeToken(token);
+        var user = userRepository.findById(id);
+        if(user.isPresent()){
+            return user.get();
+        } else return null;
+    }
+
+    public UserRole getRoleByToken(String token){
+//        User us = findUserByToken(token);
+        var us = userRepository.findById(findUserByToken(token).getId());
+        if(us.isPresent()) {
+            User user = us.get();
+//            System.out.println(user.toString());
+            System.out.println(user.getRole());
+            return user.getRole();
+        } else
+            return null;
+    }
+
+    public List<User> findAllAdmins(){
+        return userRepository.findAllByRole(UserRole.APPROVED_ADMIN);
+    }
+
+    public boolean becomeAdmin(String token) throws BadRequestException, AlreadyAdminException{
+        User us = findUserByToken(token);
+        if(getRoleByToken(token).equals(UserRole.APPROVED_ADMIN)){
+            throw new AlreadyAdminException();
+        }
+        var userVar = userRepository.findById(us.getId());
+        if(userVar.isPresent()) {
+            User user = userVar.get();
+            List<User> allAdmins = findAllAdmins();
+            if (allAdmins.isEmpty()) {
+                user.setRole(UserRole.APPROVED_ADMIN);
+                userRepository.save(user);
+                return true;
+            } else {
+                user.setRole(UserRole.WAITING_ADMIN);
+                userRepository.save(user);
+                return false;
+            }
+        }
+        throw new BadRequestException();
     }
 
 //    @Override

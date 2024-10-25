@@ -3,6 +3,7 @@ package org.example.labbb1.services;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.User;
+import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.SpaceRepository;
@@ -40,7 +41,8 @@ public class ChapterService {
         var chap = chapterRepository.findById(chapter.getId());
         if(chap.isPresent()) {
             Chapter chapter1 = chap.get();
-            if(chapter1.getUser().getId().equals(user.getId())) {
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    chapter1.getUser().getId().equals(user.getId())) {
                 chapterRepository.save(chapter);
                 return true;
             } else throw new ForbiddenException();
@@ -73,7 +75,8 @@ public class ChapterService {
         var chap = chapterRepository.findById(id);
         if(chap.isPresent()) {
             Chapter chapter = chap.get();
-            if(chapter.getUser().getId().equals(user.getId())) {
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    chapter.getUser().getId().equals(user.getId())) {
                 chapterRepository.deleteById(id);
                 return true;
             } else throw new ForbiddenException();

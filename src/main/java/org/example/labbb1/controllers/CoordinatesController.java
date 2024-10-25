@@ -159,6 +159,7 @@ public class CoordinatesController {
             coordinates.getUser().setCoordinates(null);
             coordinates.getUser().setId(null);
             coordinates.getUser().setChapters(null);
+            coordinates.getUser().setSpaceMarines(null);
         });
     }
 

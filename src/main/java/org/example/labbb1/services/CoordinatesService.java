@@ -3,6 +3,7 @@ package org.example.labbb1.services;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Coordinates;
 import org.example.labbb1.model.User;
+import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.CoordinatesRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,8 @@ public class CoordinatesService {
         var coord = coordinatesRepository.findById(coordinates.getId());
         if(coord.isPresent()) {
             Coordinates coordinates1 = coord.get();
-            if(coordinates1.getUser().getId().equals(user.getId())) {
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    coordinates1.getUser().getId().equals(user.getId())) {
                 coordinatesRepository.save(coordinates);
                 return true;
             } else throw new ForbiddenException();
@@ -67,7 +69,8 @@ public class CoordinatesService {
         var coord = coordinatesRepository.findById(id);
         if(coord.isPresent()) {
             Coordinates coordinates = coord.get();
-            if(coordinates.getUser().getId().equals(user.getId())) {
+            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    coordinates.getUser().getId().equals(user.getId())) {
                 coordinatesRepository.deleteById(id);
                 return true;
             } else throw new ForbiddenException();

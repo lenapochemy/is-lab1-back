@@ -256,7 +256,9 @@ public class SpaceController {
     private void attributeToNull(Iterable<SpaceMarine> spaceMarines){
         spaceMarines.forEach(spaceMarine -> {
             spaceMarine.getCoordinates().setSpaceMarines(null);
+            spaceMarine.getCoordinates().setUser(null);
             spaceMarine.getChapter().setSpaceMarines(null);
+            spaceMarine.getChapter().setUser(null);
             spaceMarine.getUser().setChapters(null);
             spaceMarine.getUser().setCoordinates(null);
             spaceMarine.getUser().setSpaceMarines(null);

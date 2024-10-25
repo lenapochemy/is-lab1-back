@@ -150,6 +150,7 @@ public class ChapterController {
             chapter.getUser().setId(null);
             chapter.getUser().setCoordinates(null);
             chapter.getUser().setChapters(null);
+            chapter.getUser().setSpaceMarines(null);
         });
     }
 }
