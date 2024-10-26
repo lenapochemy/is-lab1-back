@@ -50,7 +50,6 @@ public class EclipseLinkJpaConfiguration extends JpaBaseConfiguration {
         return map;
     }
 
-
     @Bean
     public static PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory){
         final JpaTransactionManager transactionManager = new JpaTransactionManager();

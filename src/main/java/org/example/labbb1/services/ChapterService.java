@@ -1,11 +1,10 @@
 package org.example.labbb1.services;
 
 import org.example.labbb1.exceptions.ForbiddenException;
-import org.example.labbb1.model.Chapter;
-import org.example.labbb1.model.User;
-import org.example.labbb1.model.UserRole;
+import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.CoordinatesRepository;
+import org.example.labbb1.repositories.EditChapterRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ChapterService {
 
     private final ChapterRepository chapterRepository;
+    private final EditChapterRepository editChapterRepository;
 
     @Autowired
-    public ChapterService(ChapterRepository chapterRepository){
+    public ChapterService(ChapterRepository chapterRepository, EditChapterRepository editChapterRepository){
         this.chapterRepository = chapterRepository;
+        this.editChapterRepository = editChapterRepository;
     }
 
 
@@ -36,21 +39,39 @@ public class ChapterService {
 
     public void addNewChapter(Chapter chapter) throws PSQLException {
         chapterRepository.save(chapter);
+        EditChapter editChapter = new EditChapter();
+        editChapter.setChapter(chapter);
+        editChapter.setType(EditType.CREATE);
+        editChapter.setUser(chapter.getUser());
+        editChapter.setDate(LocalDateTime.now());
+        editChapterRepository.save(editChapter);
     }
+
     public boolean updateChapter(Chapter chapter, User user) throws PSQLException, ForbiddenException{
         var chap = chapterRepository.findById(chapter.getId());
         if(chap.isPresent()) {
             Chapter chapter1 = chap.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     chapter1.getUser().getId().equals(user.getId())) {
+                chapter.setUser(user);
                 chapterRepository.save(chapter);
+                EditChapter editChapter = new EditChapter();
+                editChapter.setChapter(chapter1);
+                editChapter.setType(EditType.UPDATE);
+                editChapter.setUser(chapter1.getUser());
+                editChapter.setDate(LocalDateTime.now());
+                editChapterRepository.save(editChapter);
                 return true;
             } else throw new ForbiddenException();
         } else return false;
     }
 
-    public Iterable<Chapter> getAllChapters(User user){
+    public Iterable<Chapter> getAllChaptersByUser(User user){
         return chapterRepository.findAllByUser(user);
+    }
+
+    public Iterable<Chapter> getAllChapters(){
+        return chapterRepository.findAll();
     }
     public Iterable<Chapter> getPageChapters(String sortParam, int page){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);

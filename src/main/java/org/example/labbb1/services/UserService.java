@@ -61,13 +61,10 @@ public class UserService {
     }
 
     public User findUserByToken(String token){
-        System.out.println(7);
         Integer id =  tokenHasher.userIdDecodeToken(token);
         var user = userRepository.findById(id);
         if(user.isPresent()){
-            System.out.println(8);
             User user1 =  user.get();
-            System.out.println(user1.getId() + " " + user1.getLogin() + " " + user1.getRole());
             return user1;
         } else return null;
     }

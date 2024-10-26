@@ -20,6 +20,7 @@ public interface ChapterRepository extends JpaRepository<Chapter, Long> {
     Page<Chapter> findAllByName (Pageable pageable, String name);
     Page<Chapter> findAllByParentLegion (Pageable pageable, String parentLegion);
     List<Chapter> findAllByUser(User user);
+    Chapter findByName(String name);
 
 //    Chapter findById(Long id);
 

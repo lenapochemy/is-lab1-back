@@ -38,12 +38,6 @@ public class SpecialController {
         }
         SpaceMarine spaceMarine = specialService.getSpaceMarineWithMinChapter();
         attrToNull(spaceMarine);
-//        spaceMarine.setUser(null);
-//        spaceMarine.getCoordinates().setUser(null);
-//        spaceMarine.getCoordinates().setSpaceMarines(null);
-//        spaceMarine.getChapter().setUser(null);
-//        spaceMarine.getChapter().setSpaceMarines(null);
-
         return ResponseEntity.ok(spaceMarine);
     }
 

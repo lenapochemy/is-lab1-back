@@ -5,6 +5,7 @@ import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.CoordinatesRepository;
+import org.example.labbb1.repositories.EditSpaceMarineRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,19 +24,24 @@ import java.util.Optional;
 public class SpaceService {
 
     private final SpaceRepository spaceRepository;
-//    private final ChapterRepository chapterRepository;
-//    private final CoordinatesRepository coordinatesRepository;
+    private final EditSpaceMarineRepository editSpaceMarineRepository;
+
 
     @Autowired
-    public SpaceService(SpaceRepository spaceRepository, ChapterRepository chapterRepository, CoordinatesRepository coordinatesRepository){
+    public SpaceService(SpaceRepository spaceRepository, EditSpaceMarineRepository editSpaceMarineRepository){
         this.spaceRepository = spaceRepository;
-//        this.chapterRepository = chapterRepository;
-//        this.coordinatesRepository = coordinatesRepository;
+        this.editSpaceMarineRepository = editSpaceMarineRepository;
     }
 
 
     public void addNewSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
         spaceRepository.save(spaceMarine);
+        EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
+        editSpaceMarine.setSpaceMarine(spaceMarine);
+        editSpaceMarine.setType(EditType.CREATE);
+        editSpaceMarine.setUser(spaceMarine.getUser());
+        editSpaceMarine.setDate(LocalDateTime.now());
+        editSpaceMarineRepository.save(editSpaceMarine);
     }
 
     public boolean updateSpaceMarine(SpaceMarine spaceMarine, User user) throws PSQLException, ForbiddenException{
@@ -46,6 +52,12 @@ public class SpaceService {
                     spaceMarine1.getUser().getId().equals(user.getId())){
                 spaceMarine.setUser(spaceMarine1.getUser());
                 spaceRepository.save(spaceMarine);
+                EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
+                editSpaceMarine.setSpaceMarine(spaceMarine);
+                editSpaceMarine.setType(EditType.UPDATE);
+                editSpaceMarine.setUser(spaceMarine.getUser());
+                editSpaceMarine.setDate(LocalDateTime.now());
+                editSpaceMarineRepository.save(editSpaceMarine);
                 return true;
             } else throw new ForbiddenException();
         } else return false;
@@ -68,8 +80,12 @@ public class SpaceService {
         return spaceRepository.findAll(pageable);
     }
 
-    public Iterable<SpaceMarine> getAllSpaceMarine(User user){
+    public Iterable<SpaceMarine> getAllSpaceMarineByUser(User user){
         return spaceRepository.findAllByUser(user);
+    }
+
+    public Iterable<SpaceMarine> getAllSpaceMarine(){
+        return spaceRepository.findAll();
     }
 
     public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, String name){

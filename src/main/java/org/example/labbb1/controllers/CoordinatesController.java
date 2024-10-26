@@ -51,6 +51,20 @@ public class CoordinatesController {
 
 
     @GetMapping()
+    public ResponseEntity<?> getAllCoordinatesByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if(token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        User user = userService.findUserByToken(token);
+        Iterable<Coordinates> coords = coordinatesService.getAllCoordinatesByUser(user);
+        attributeToNull(coords);
+        return ResponseEntity.ok(coords);
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<?> getAllCoordinates(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -59,7 +73,7 @@ public class CoordinatesController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         User user = userService.findUserByToken(token);
-        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates(user);
+        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates();
         attributeToNull(coords);
         return ResponseEntity.ok(coords);
     }

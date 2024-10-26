@@ -69,6 +69,20 @@ public class SpaceController {
     }
 
     @GetMapping()
+    public ResponseEntity<?> getAllSpaceMarineByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if( token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        User user = userService.findUserByToken(token);
+        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarineByUser(user);
+        attributeToNull(spaceMarines);
+        return ResponseEntity.ok(spaceMarines);
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<?> getAllSpaceMarine(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if( token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -77,7 +91,7 @@ public class SpaceController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         User user = userService.findUserByToken(token);
-        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine(user);
+        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
         attributeToNull(spaceMarines);
         return ResponseEntity.ok(spaceMarines);
     }

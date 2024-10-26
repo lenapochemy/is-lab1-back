@@ -18,6 +18,8 @@ public interface CoordinatesRepository extends PagingAndSortingRepository<Coordi
     Iterable<Coordinates> findAll(Sort sort);
 
     Coordinates findById (long id);
+    Coordinates findByX (Integer x);
+
 
     Page<Coordinates> findAllByX(Pageable pageable, Integer x);
     Page<Coordinates> findAllByY(Pageable pageable, Float y);

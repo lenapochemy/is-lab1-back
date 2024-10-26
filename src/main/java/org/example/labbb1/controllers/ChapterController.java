@@ -4,6 +4,7 @@ import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.User;
 import org.example.labbb1.services.ChapterService;
+import org.example.labbb1.services.EditService;
 import org.example.labbb1.services.UserService;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,13 @@ public class ChapterController {
 
     private final ChapterService chapterService;
     private final UserService userService;
+    private final EditService editService;
     @Autowired
-    public ChapterController(ChapterService chapterService, UserService userService) {
+    public ChapterController(ChapterService chapterService, UserService userService,
+                             EditService editService) {
         this.chapterService = chapterService;
         this.userService = userService;
+        this.editService = editService;
     }
 
     @PostMapping("/create")
@@ -38,6 +42,7 @@ public class ChapterController {
         chapter.setUser(user);
         try {
             chapterService.addNewChapter(chapter);
+//            editService.addNewEditChapterOnCreate(chapter.getName());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -70,7 +75,7 @@ public class ChapterController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllChapters(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    public ResponseEntity<?> getAllChaptersByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -78,7 +83,21 @@ public class ChapterController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
         User user = userService.findUserByToken(token);
-        Iterable<Chapter> chapters = chapterService.getAllChapters(user);
+        Iterable<Chapter> chapters = chapterService.getAllChaptersByUser(user);
+        attributeToNull(chapters);
+        return ResponseEntity.ok(chapters);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllChapters(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if(token == null || token.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        if(!userService.verifyToken(token)){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+//        User user = userService.findUserByToken(token);
+        Iterable<Chapter> chapters = chapterService.getAllChapters();
         attributeToNull(chapters);
         return ResponseEntity.ok(chapters);
     }
