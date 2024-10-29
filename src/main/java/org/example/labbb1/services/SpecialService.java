@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -56,8 +57,10 @@ public class SpecialService {
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
         List<SpaceMarine> spaceMarines = new ArrayList<>();
         for(SpaceMarine marine : spaceMarineList){
-            if(marine.getMeleeWeapon().compareTo(meleeWeapon) > 0){
-                spaceMarines.add(marine);
+            if(marine.getMeleeWeapon() != null) {
+                if (marine.getMeleeWeapon().compareTo(meleeWeapon) > 0) {
+                    spaceMarines.add(marine);
+                }
             }
         }
         return spaceMarines;

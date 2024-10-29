@@ -1,8 +1,6 @@
 package org.example.labbb1.controllers;
 
-import org.example.labbb1.exceptions.AlreadyAdminException;
-import org.example.labbb1.exceptions.BadRequestException;
-import org.example.labbb1.exceptions.ForbiddenException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
 import org.example.labbb1.services.UserService;
@@ -35,11 +33,12 @@ public class UserController {
     public ResponseEntity<?> registration(@RequestBody User user){
 //        System.out.println("req query: " + user.getLogin() + " " + user.getPassword());
         try {
-            if (userService.regNewUser(user)) {
-                return new ResponseEntity<>(HttpStatus.OK);
-            } else return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } catch (PSQLException e){
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+             userService.regNewUser(user);
+             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (LoginAlreadyExistsException e){
+            return new ResponseEntity<>("login", HttpStatus.UNAUTHORIZED);
+        } catch (PasswordAlreadyExistsException e){
+            return new ResponseEntity<>("password", HttpStatus.UNAUTHORIZED);
         }
     }
 

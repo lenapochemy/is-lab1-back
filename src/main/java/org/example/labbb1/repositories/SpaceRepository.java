@@ -10,13 +10,13 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface SpaceRepository extends CrudRepository<SpaceMarine, Long>, PagingAndSortingRepository<SpaceMarine, Long> {
 
     Page<SpaceMarine> findAll (Pageable pageable);
 //    SpaceMarine findById(Long id);
-
     Iterable<SpaceMarine> findAllByUser(User user);
     Page<SpaceMarine> findAllByName(Pageable pageable, String name);
     Page<SpaceMarine> findAllByCoordinates(Pageable pageable, Coordinates coordinates);

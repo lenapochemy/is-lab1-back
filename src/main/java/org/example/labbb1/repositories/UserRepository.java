@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User, Integer> {
 
     User findByLogin(String login);
+    User findByPassword(String password);
     Optional<User> findById(Integer id);
 
     List<User> findAllByRole(UserRole role);

@@ -1,9 +1,7 @@
 package org.example.labbb1.services;
 
 
-import org.example.labbb1.exceptions.AlreadyAdminException;
-import org.example.labbb1.exceptions.BadRequestException;
-import org.example.labbb1.exceptions.ForbiddenException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.UserRepository;
@@ -30,16 +28,20 @@ public class UserService {
         this.tokenHasher = new TokenHasher();
     }
 
-    public boolean regNewUser(User user) throws PSQLException {
+    public void regNewUser(User user) throws LoginAlreadyExistsException, PasswordAlreadyExistsException{
         User user1 = userRepository.findByLogin(user.getLogin());
         if(user1 != null){
-            return false;
+            throw new LoginAlreadyExistsException();
         }
-        user.setPassword(passwordHasher.hashPassword(user.getPassword()));
+        String hashedPassword = passwordHasher.hashPassword(user.getPassword());
+        user1 = userRepository.findByPassword(hashedPassword);
+        if(user1 != null){
+            throw new PasswordAlreadyExistsException();
+        }
+        user.setPassword(hashedPassword);
         user.setRole(UserRole.USER);
-//        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         userRepository.save(user);
-        return true;
+//        return true;
     }
 
     public String logIn(User user){
