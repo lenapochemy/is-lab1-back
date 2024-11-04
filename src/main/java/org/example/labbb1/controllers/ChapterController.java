@@ -33,15 +33,14 @@ public class ChapterController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter,
-                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(chapter.getName() == null ||chapter.getName().isEmpty() || token == null || token.isEmpty()){
+    public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter){
+        if(chapter.getName() == null ||chapter.getName().isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+        User user = userService.findUserByToken();
         chapter.setUser(user);
         try {
             chapterService.addNewChapter(chapter);
@@ -53,18 +52,16 @@ public class ChapterController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateChapter(@RequestBody Chapter chapter,
-                                           @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    public ResponseEntity<?> updateChapter(@RequestBody Chapter chapter){
         Chapter chapter1 = chapterService.getChapterById(chapter.getId());
-        if(chapter.getName() == null ||chapter.getName().isEmpty() || chapter1 == null ||
-                token == null || token.isEmpty()){
+        if(chapter.getName() == null ||chapter.getName().isEmpty() || chapter1 == null ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         try {
-            User user = userService.findUserByToken(token);
+            User user = userService.findUserByToken();
             if(chapterService.updateChapter(chapter, user)){
                 return new ResponseEntity<>(HttpStatus.OK);
             } else
@@ -82,14 +79,13 @@ public class ChapterController {
                                                        @PathVariable(required = false) String filter_value,
                                                        @PathVariable(required = false) String sort_param,
                                                        @PathVariable(required = false) Integer page,
-                                                       @PathVariable(required = false) Integer size,
-                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+                                                       @PathVariable(required = false) Integer size){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
 
         Iterable<Chapter> chapters;
         switch (filter_param){
@@ -102,7 +98,7 @@ public class ChapterController {
                 break;
             }
             case "user": {
-                User user = userService.findUserByToken(token);
+                User user = userService.findUserByToken();
                 chapters = chapterService.getAllChaptersByUser(user);
                 if(filter_value != null){
                     List<Long> chaptersId = new ArrayList<>();
@@ -128,14 +124,9 @@ public class ChapterController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteChapter(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
+    public ResponseEntity<?> deleteChapter(@PathVariable Long id){
+
+        User user = userService.findUserByToken();
         try {
             if (chapterService.deleteChapter(id, user)) {
                 return new ResponseEntity<>(HttpStatus.OK);

@@ -1,5 +1,6 @@
 package org.example.labbb1.controllers;
 
+import jakarta.annotation.security.RolesAllowed;
 import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/user")
 public class UserController {
 
@@ -54,28 +54,29 @@ public class UserController {
 
 
     @GetMapping("/admin/role")
-    public ResponseEntity<?> getRole(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        UserRole role = userService.getRoleByToken(token);
-        System.out.println(role);
-        return ResponseEntity.ok(role);
+    public ResponseEntity<?> getRole(){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+        User user = userService.findUserByToken();
+//        System.out.println(role);
+        return ResponseEntity.ok(user.getRole());
     }
 
     @PostMapping("/admin/become")
-    public ResponseEntity<?> becomeAdmin(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> becomeAdmin(){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         try {
-            if(userService.becomeAdmin(token)){
+            User user = userService.findUserByToken();
+            if(userService.becomeAdmin(user)){
                 return ResponseEntity.ok("Now you are admin!");
             } else {
                 return ResponseEntity.ok("Your request will be approved in future");
@@ -88,15 +89,16 @@ public class UserController {
     }
 
     @PostMapping("/admin/approve/{id}")
-    public ResponseEntity<?> approveAdmin(@PathVariable Integer id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(id == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> approveAdmin(@PathVariable Integer id){
+//        if(id == null || token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         try{
-            userService.approveAdmin(id, token);
+            User user = userService.findUserByToken();
+            userService.approveAdmin(id, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (BadRequestException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -105,14 +107,15 @@ public class UserController {
         }
     }
 
+    @RolesAllowed("APPROVED_ADMIN")
     @GetMapping("/admin")
-    public ResponseEntity<?> getWaitingAdmins(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> getWaitingAdmins(){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         List<User> users = userService.getWaitingAdmins();
         attributeToNull(users);
         return ResponseEntity.ok(users);

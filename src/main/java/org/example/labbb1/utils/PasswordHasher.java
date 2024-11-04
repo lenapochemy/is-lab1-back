@@ -1,10 +1,12 @@
 package org.example.labbb1.utils;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class PasswordHasher {
+public class PasswordHasher implements PasswordEncoder {
 
     public PasswordHasher(){}
     public String hashPassword(String password){
@@ -20,5 +22,15 @@ public class PasswordHasher {
         } catch (NoSuchAlgorithmException e){
             return null;
         }
+    }
+
+    @Override
+    public String encode(CharSequence rawPassword){
+        return hashPassword(rawPassword.toString());
+    }
+
+    @Override
+    public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        return encodedPassword.equals(hashPassword(rawPassword.toString()));
     }
 }

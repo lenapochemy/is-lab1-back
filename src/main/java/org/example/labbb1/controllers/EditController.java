@@ -30,14 +30,13 @@ public class EditController {
     }
 
     @GetMapping("/chapter/{id}")
-    public ResponseEntity<?> getEditChapters(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                             @PathVariable Long id){
-        if(id == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> getEditChapters(@PathVariable Long id){
+//        if(id == null || token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         Chapter chapter = chapterService.getChapterById(id);
         Iterable<EditChapter> chapters = editService.getEditChapterByChapter(chapter);
         chapters.forEach(editChapter -> {
@@ -54,14 +53,13 @@ public class EditController {
     }
 
     @GetMapping("/coord/{id}")
-    public ResponseEntity<?> getEditCoords(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                             @PathVariable Long id){
-        if(id == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> getEditCoords(@PathVariable Long id){
+//        if(id == null || token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         Coordinates coordinates = coordinatesService.getCoordById(id);
         Iterable<EditCoordinates> coords = editService.getEditCoordByCoords(coordinates);
         coords.forEach(editCoordinates -> {
@@ -78,14 +76,14 @@ public class EditController {
     }
 
     @GetMapping("/spaceMarine/{id}")
-    public ResponseEntity<?> getEditSpaceMarine(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+    public ResponseEntity<?> getEditSpaceMarine(
                                              @PathVariable Long id){
-        if(id == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        if(id == null || token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         SpaceMarine spaceMarine = spaceService.getSpaceMarine(id);
         Iterable<EditSpaceMarine> spaceMarines = editService.getEditSpaceMarineBySPaceMarine(spaceMarine);
         spaceMarines.forEach(editSpaceMarine -> {

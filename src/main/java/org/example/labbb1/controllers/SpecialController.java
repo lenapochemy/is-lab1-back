@@ -29,27 +29,27 @@ public class SpecialController {
     }
 
     @GetMapping("/minChapter")
-    public ResponseEntity<?> getSpaceMarineWithMinChapter(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> getSpaceMarineWithMinChapter(){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         SpaceMarine spaceMarine = specialService.getSpaceMarineWithMinChapter();
         attrToNull(spaceMarine);
         return ResponseEntity.ok(spaceMarine);
     }
 
     @GetMapping("/nameStart/{name}")
-    public ResponseEntity<?> getSpaceMarineWithNameStart(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
+    public ResponseEntity<?> getSpaceMarineWithNameStart(
                                                          @PathVariable String name){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         List<SpaceMarine> spaceMarines = specialService.getSpaceMarinesWithNameStart(name);
         spaceMarines.forEach(this::attrToNull);
         return ResponseEntity.ok(spaceMarines);
@@ -57,29 +57,27 @@ public class SpecialController {
 
 
     @GetMapping("/greaterMeleeWeapon/{weapon}")
-    public ResponseEntity<?> getSpaceMarineWithGreaterMeleeWeapon(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                                                  @PathVariable MeleeWeapon weapon){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+    public ResponseEntity<?> getSpaceMarineWithGreaterMeleeWeapon(@PathVariable MeleeWeapon weapon){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         List<SpaceMarine> spaceMarines = specialService.getSpaceMarinesWithGreaterMeleeWeapon(weapon);
         spaceMarines.forEach(this::attrToNull);
         return ResponseEntity.ok(spaceMarines);
     }
 
     @PostMapping("/newChapter")
-    public ResponseEntity<?> createNewChapter(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                                                  @RequestBody Chapter chapter){
-        if(chapter == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
+    public ResponseEntity<?> createNewChapter(@RequestBody Chapter chapter){
+//        if(chapter == null || token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+        User user = userService.findUserByToken();
         System.out.println(chapter.getName());
         System.out.println(chapter.getParentLegion());
         specialService.saveNewChapter(chapter, user);
@@ -87,16 +85,15 @@ public class SpecialController {
     }
 
     @PostMapping("/spaceMarineToChapter/{id}")
-    public ResponseEntity<?> spaceMarineToChapter(@RequestHeader(HttpHeaders.AUTHORIZATION) String token,
-                                                  @RequestBody SpaceMarine spaceMarine, @PathVariable Long id){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
-        if(specialService.marineToChapter(spaceMarine, id, user)) {
+    public ResponseEntity<?> spaceMarineToChapter(@RequestBody SpaceMarine spaceMarine, @PathVariable Long id){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+//        User user = userService.findUserByToken();
+        if(specialService.marineToChapter(spaceMarine, id)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -108,5 +105,8 @@ public class SpecialController {
         spaceMarine.getCoordinates().setSpaceMarines(null);
         spaceMarine.getChapter().setUser(null);
         spaceMarine.getChapter().setSpaceMarines(null);
+        spaceMarine.setEditSpaceMarines(null);
+        spaceMarine.getChapter().setEditChapters(null);
+        spaceMarine.getCoordinates().setEditCoordinates(null);
     }
 }

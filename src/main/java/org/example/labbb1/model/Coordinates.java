@@ -33,8 +33,7 @@ public class Coordinates {
     @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SpaceMarine> spaceMarines;
 
-
-    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EditCoordinates> editCoordinates;
 
 //    public void removeSpaceMarine(SpaceMarine spaceMarine){

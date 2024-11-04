@@ -7,15 +7,18 @@ import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.UserRepository;
 import org.example.labbb1.utils.PasswordHasher;
 import org.example.labbb1.utils.TokenHasher;
-import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import javax.management.BadAttributeValueExpException;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordHasher passwordHasher;
@@ -40,6 +43,7 @@ public class UserService {
         }
         user.setPassword(hashedPassword);
         user.setRole(UserRole.USER);
+//        user.setRoles(Collections.singleton(new Role(1L, "ROLE_USER")));
         userRepository.save(user);
 //        return true;
     }
@@ -62,9 +66,12 @@ public class UserService {
         return userRepository.findByLogin(login);
     }
 
-    public User findUserByToken(String token){
-        Integer id =  tokenHasher.userIdDecodeToken(token);
-        var user = userRepository.findById(id);
+    public User findUserByToken(){
+//        Integer id =  tokenHasher.userIdDecodeToken(token);
+//        var user = userRepository.findById(id);
+        var caller_name = SecurityContextHolder.getContext().getAuthentication().getName();
+        var userNoOpt = userRepository.findByLogin(caller_name);
+        var user = userRepository.findById(userNoOpt.getId());
         if(user.isPresent()){
             User user1 =  user.get();
             return user1;
@@ -73,7 +80,7 @@ public class UserService {
 
     public UserRole getRoleByToken(String token){
 //        User us = findUserByToken(token);
-        var us = userRepository.findById(findUserByToken(token).getId());
+        var us = userRepository.findById(findUserByToken().getId());
         if(us.isPresent()) {
             User user = us.get();
 //            System.out.println(user.toString());
@@ -87,9 +94,9 @@ public class UserService {
         return userRepository.findAllByRole(UserRole.APPROVED_ADMIN);
     }
 
-    public boolean becomeAdmin(String token) throws BadRequestException, AlreadyAdminException{
-        User us = findUserByToken(token);
-        if(getRoleByToken(token).equals(UserRole.APPROVED_ADMIN)){
+    public boolean becomeAdmin(User us) throws BadRequestException, AlreadyAdminException{
+//        User us = findUserByToken(token);
+        if(us.getRole().equals(UserRole.APPROVED_ADMIN)){
             throw new AlreadyAdminException();
         }
         var userVar = userRepository.findById(us.getId());
@@ -109,8 +116,8 @@ public class UserService {
         throw new BadRequestException();
     }
 
-    public void approveAdmin(Integer id, String token) throws ForbiddenException, BadRequestException{
-        if(getRoleByToken(token).equals(UserRole.APPROVED_ADMIN)){
+    public void approveAdmin(Integer id, User admin) throws ForbiddenException, BadRequestException{
+        if(admin.getRole().equals(UserRole.APPROVED_ADMIN)){
             var us = userRepository.findById(id);
             if(us.isPresent()){
                 User user = us.get();
@@ -124,11 +131,11 @@ public class UserService {
         return userRepository.findAllByRole(UserRole.WAITING_ADMIN);
     }
 
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
-//        User user = userRepository.findByUsername(username);
-//
-//        if(user == null) throw new UsernameNotFoundException("User not found");
-//        return user;
-//    }
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByLogin(username);
+
+        if(user == null) throw new UsernameNotFoundException("User not found");
+        return user;
+    }
 }

@@ -30,16 +30,14 @@ public class CoordinatesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates,
-                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147 ||
-            token == null || token.isEmpty()){
+    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+        User user = userService.findUserByToken();
 
         coordinates.setUser(user);
         try {
@@ -56,14 +54,13 @@ public class CoordinatesController {
                                                @PathVariable(required = false) String filter_value,
                                                @PathVariable(required = false) String sort_param,
                                                @PathVariable(required = false) Integer page,
-                                               @PathVariable(required = false) Integer size,
-                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+                                               @PathVariable(required = false) Integer size){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
         Iterable<Coordinates> coords;
         try {
             switch (filter_param) {
@@ -85,7 +82,7 @@ public class CoordinatesController {
                     break;
                 }
                 case "user":{
-                    User user = userService.findUserByToken(token);
+                    User user = userService.findUserByToken();
                     coords = coordinatesService.getAllCoordinatesByUser(user);
                     if(filter_value != null){
                         List<Long> coordsId = new ArrayList<>();
@@ -111,18 +108,16 @@ public class CoordinatesController {
 
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates,
-                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
         Coordinates coordinates1 = coordinatesService.getCoordById(coordinates.getId());
-        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147 ||
-                coordinates1 == null || token == null || token.isEmpty()){
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
+//        i(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }f
         try {
-            User user = userService.findUserByToken(token);
+            User user = userService.findUserByToken();
             if(coordinatesService.updateCoordinate(coordinates, user)) {
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
@@ -137,14 +132,14 @@ public class CoordinatesController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCoord(@PathVariable Long id, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
+    public ResponseEntity<?> deleteCoord(@PathVariable Long id){
+//        if(token == null || token.isEmpty()){
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        if(!userService.verifyToken(token)){
+//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+//        }
+        User user = userService.findUserByToken();
         try{
             if(coordinatesService.deleteCoord(id, user)) {
                 return new ResponseEntity<>(HttpStatus.OK);

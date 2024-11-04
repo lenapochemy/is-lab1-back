@@ -20,13 +20,12 @@ public class SpecialService {
 
     private final SpaceRepository spaceRepository;
     private final ChapterRepository chapterRepository;
-    private final CoordinatesRepository coordinatesRepository;
+
 
     @Autowired
-    public SpecialService(SpaceRepository spaceRepository, ChapterRepository chapterRepository, CoordinatesRepository coordinatesRepository){
+    public SpecialService(SpaceRepository spaceRepository, ChapterRepository chapterRepository){
         this.spaceRepository = spaceRepository;
         this.chapterRepository = chapterRepository;
-        this.coordinatesRepository = coordinatesRepository;
     }
 
     public SpaceMarine getSpaceMarineWithMinChapter(){
@@ -74,11 +73,11 @@ public class SpecialService {
         chapterRepository.save(chapter);
     }
 
-    public boolean marineToChapter(SpaceMarine marine, Long chapterId, User user){
+    public boolean marineToChapter(SpaceMarine marine, Long chapterId){
         var chapter = chapterRepository.findById(chapterId);
         if(chapter.isPresent()) {
             marine.setChapter(chapter.get());
-            marine.setUser(user);
+//            marine.setUser(user);
             spaceRepository.save(marine);
             return true;
         } else
