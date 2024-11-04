@@ -21,6 +21,7 @@ public class EditCoordinates {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @JoinColumn(nullable = false)
     @ManyToOne
     private Coordinates coordinates;
 

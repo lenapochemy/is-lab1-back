@@ -47,7 +47,7 @@ public class SpaceMarine {
     @ManyToOne
     private User user;
 
-    @OneToMany(mappedBy = "spaceMarine", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "spaceMarine", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<EditSpaceMarine> editSpaceMarines;
 
 }
