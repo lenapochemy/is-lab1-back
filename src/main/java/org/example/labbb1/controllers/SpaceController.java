@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @CrossOrigin
@@ -68,7 +70,7 @@ public class SpaceController {
         }
     }
 
-    @GetMapping(value = {"{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}"})
+    @GetMapping(value = {"{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}", "{filter_param}/{filter_value}"})
     public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable String filter_param,
                                                       @PathVariable(required = false) String filter_value,
                                                       @PathVariable(required = false) String sort_param,
@@ -105,6 +107,13 @@ public class SpaceController {
             case "user":{
                 User user = userService.findUserByToken(token);
                 spaceMarines = spaceService.getAllSpaceMarineByUser(user);
+                if(filter_value != null){
+                    List<Long> spaceMarinesId = new ArrayList<>();
+                    spaceMarines.forEach(spaceMarine -> {
+                        spaceMarinesId.add(spaceMarine.getId());
+                    });
+                    return ResponseEntity.ok(spaceMarinesId);
+                }
                 break;
             }
             case "all": {

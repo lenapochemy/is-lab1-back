@@ -81,6 +81,9 @@ public class SpaceService {
     }
 
     public Iterable<SpaceMarine> getAllSpaceMarineByUser(User user){
+        if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
+            return getAllSpaceMarine();
+        }
         return spaceRepository.findAllByUser(user);
     }
 

@@ -67,6 +67,9 @@ public class ChapterService {
     }
 
     public Iterable<Chapter> getAllChaptersByUser(User user){
+        if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
+            return getAllChapters();
+        }
         return chapterRepository.findAllByUser(user);
     }
 

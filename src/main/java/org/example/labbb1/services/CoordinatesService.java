@@ -60,6 +60,9 @@ public class CoordinatesService {
 
 
     public Iterable<Coordinates> getAllCoordinatesByUser(User user){
+        if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
+            return getAllCoordinates();
+        }
         return coordinatesRepository.findAllByUser(user);
     }
 

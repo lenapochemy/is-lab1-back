@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -50,7 +51,7 @@ public class CoordinatesController {
     }
 
 
-    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "/{filter_param}"})
+    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "/{filter_param}", "/{filter_param}/{filter_value}"})
     public ResponseEntity<?> getCoordinatesByY(@PathVariable String filter_param,
                                                @PathVariable(required = false) String filter_value,
                                                @PathVariable(required = false) String sort_param,
@@ -86,6 +87,13 @@ public class CoordinatesController {
                 case "user":{
                     User user = userService.findUserByToken(token);
                     coords = coordinatesService.getAllCoordinatesByUser(user);
+                    if(filter_value != null){
+                        List<Long> coordsId = new ArrayList<>();
+                        coords.forEach(coordinates -> {
+                            coordsId.add(coordinates.getId());
+                        });
+                        return ResponseEntity.ok(coordsId);
+                    }
                     break;
                 }
                 default: {
