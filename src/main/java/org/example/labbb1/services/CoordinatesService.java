@@ -67,21 +67,21 @@ public class CoordinatesService {
         return coordinatesRepository.findAll();
     }
 
-    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page){
+    public Iterable<Coordinates> getPageCoordinates(String sortParam, int page, int size){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return coordinatesRepository.findAll(pageable);
     }
 
-    public Iterable<Coordinates> getPageCoordinatesByX(String sortParam, int page, Integer x){
+    public Iterable<Coordinates> getPageCoordinatesByX(String sortParam, int page, int size, Integer x){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return coordinatesRepository.findAllByX(pageable, x);
     }
 
-    public Iterable<Coordinates> getPageCoordinatesByY(String sortParam, int page, Float y){
+    public Iterable<Coordinates> getPageCoordinatesByY(String sortParam, int page, int size, Float y){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return coordinatesRepository.findAllByY(pageable, y);
     }
 

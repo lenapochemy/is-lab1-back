@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "space_marine")
@@ -45,5 +46,8 @@ public class SpaceMarine {
 
     @ManyToOne
     private User user;
+
+    @OneToMany(mappedBy = "spaceMarine", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<EditSpaceMarine> editSpaceMarines;
 
 }

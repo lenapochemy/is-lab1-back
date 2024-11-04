@@ -32,4 +32,7 @@ public class Chapter {
 
     @ManyToOne
     private User user;
+
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<EditChapter> editChapters;
 }

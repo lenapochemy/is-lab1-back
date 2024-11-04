@@ -73,21 +73,21 @@ public class ChapterService {
     public Iterable<Chapter> getAllChapters(){
         return chapterRepository.findAll();
     }
-    public Iterable<Chapter> getPageChapters(String sortParam, int page){
+    public Iterable<Chapter> getPageChapters(String sortParam, int page, int size){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return chapterRepository.findAll(pageable);
     }
 
-    public Iterable<Chapter> getPageChapterByName(String sortParam, int page, String name){
+    public Iterable<Chapter> getPageChapterByName(String sortParam, int page, int size, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return chapterRepository.findAllByName(pageable, name);
     }
 
-    public Iterable<Chapter> getPageChapterByParentLegion(String sortParam, int page, String parentLegion){
+    public Iterable<Chapter> getPageChapterByParentLegion(String sortParam, int page, int size, String parentLegion){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return chapterRepository.findAllByParentLegion(pageable, parentLegion);
     }
 

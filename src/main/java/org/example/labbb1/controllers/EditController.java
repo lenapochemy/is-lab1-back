@@ -47,6 +47,7 @@ public class EditController {
             editChapter.getUser().setPassword(null);
             editChapter.getUser().setId(null);
             editChapter.getChapter().setUser(null);
+            editChapter.getChapter().setSpaceMarines(null);
         });
         return ResponseEntity.ok(chapters);
     }
@@ -69,6 +70,7 @@ public class EditController {
             editCoordinates.getUser().setPassword(null);
             editCoordinates.getUser().setId(null);
             editCoordinates.getCoordinates().setUser(null);
+            editCoordinates.getCoordinates().setSpaceMarines(null);
         });
         return ResponseEntity.ok(coords);
     }

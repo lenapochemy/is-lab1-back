@@ -74,72 +74,45 @@ public class ChapterController {
         }
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getAllChaptersByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}"})
+    public ResponseEntity<?> getChaptersByparentlegion(@PathVariable String filter_param,
+                                                       @PathVariable(required = false) String filter_value,
+                                                       @PathVariable(required = false) String sort_param,
+                                                       @PathVariable(required = false) Integer page,
+                                                       @PathVariable(required = false) Integer size,
+                                                       @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(!userService.verifyToken(token)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        User user = userService.findUserByToken(token);
-        Iterable<Chapter> chapters = chapterService.getAllChaptersByUser(user);
-        attributeToNull(chapters);
-        return ResponseEntity.ok(chapters);
-    }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllChapters(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Iterable<Chapter> chapters;
+        switch (filter_param){
+            case "name":{
+                chapters = chapterService.getPageChapterByName(sort_param, page, size, filter_value);
+                break;
+            }
+            case "parentLegion": {
+                chapters = chapterService.getPageChapterByParentLegion(sort_param, page, size, filter_value);
+                break;
+            }
+            case "user": {
+                User user = userService.findUserByToken(token);
+                chapters = chapterService.getAllChaptersByUser(user);
+                break;
+            }
+            case "all": {
+                if(size == null){
+                    chapters = chapterService.getAllChapters();
+                } else
+                    chapters = chapterService.getPageChapters(sort_param, page, size);
+                break;
+            }
+            default:
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-//        User user = userService.findUserByToken(token);
-        Iterable<Chapter> chapters = chapterService.getAllChapters();
-        attributeToNull(chapters);
-        return ResponseEntity.ok(chapters);
-    }
-
-    @GetMapping("/{sort}/{page}")
-    public ResponseEntity<?> getChapters(@PathVariable String sort, @PathVariable Integer page,
-                                         @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<Chapter> chapters = chapterService.getPageChapters(sort, page);
-        attributeToNull(chapters);
-        return ResponseEntity.ok(chapters);
-    }
-
-    @GetMapping("/byName/{name}/{sort}/{page}")
-    public ResponseEntity<?> getChaptersByName(@PathVariable String name, @PathVariable String sort,
-                                               @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<Chapter> chapters = chapterService.getPageChapterByName(sort, page, name);
-        attributeToNull(chapters);
-        return ResponseEntity.ok(chapters);
-    }
-
-    @GetMapping("/byParentLegion/{parentLegion}/{sort}/{page}")
-    public ResponseEntity<?> getChaptersByparentlegion(@PathVariable String parentLegion, @PathVariable String sort,
-                                                       @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<Chapter> chapters = chapterService.getPageChapterByParentLegion(sort, page, parentLegion);
         attributeToNull(chapters);
         return ResponseEntity.ok(chapters);
     }
@@ -163,14 +136,17 @@ public class ChapterController {
         }
     }
 
-    private void attributeToNull(Iterable<Chapter> chapters){
-        chapters.forEach(chapter -> {
-            chapter.setSpaceMarines(null);
-            chapter.getUser().setPassword(null);
-            chapter.getUser().setId(null);
-            chapter.getUser().setCoordinates(null);
-            chapter.getUser().setChapters(null);
-            chapter.getUser().setSpaceMarines(null);
-        });
+    private void attributeToNull(Iterable<Chapter> chapters) {
+        if (chapters != null) {
+            chapters.forEach(chapter -> {
+                chapter.setSpaceMarines(null);
+                chapter.getUser().setPassword(null);
+                chapter.getUser().setId(null);
+                chapter.getUser().setCoordinates(null);
+                chapter.getUser().setChapters(null);
+                chapter.getUser().setSpaceMarines(null);
+                chapter.setEditChapters(null);
+            });
+        }
     }
 }

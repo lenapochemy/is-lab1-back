@@ -74,9 +74,9 @@ public class SpaceService {
     }
 
 
-    public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page){
+    public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page, int size){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAll(pageable);
     }
 
@@ -88,51 +88,51 @@ public class SpaceService {
         return spaceRepository.findAll();
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, String name){
+    public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, int size, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByName(pageable, name);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByCoordinates(String sortParam, int page, Coordinates coordinates){
+    public Iterable<SpaceMarine> getPageSpaceMarineByCoordinates(String sortParam, int page, int size, Coordinates coordinates){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByCoordinates(pageable, coordinates);
     }
-    public Iterable<SpaceMarine> getPageSpaceMarineByCreationDate(String sortParam, int page, LocalDateTime creationDate){
-        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
-        return spaceRepository.findAllByCreationDate(pageable, creationDate);
-    }
+//    public Iterable<SpaceMarine> getPageSpaceMarineByCreationDate(String sortParam, int page, int size, LocalDateTime creationDate){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return spaceRepository.findAllByCreationDate(pageable, creationDate);
+//    }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, Chapter chapter){
+    public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, int size, Chapter chapter){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByChapter(pageable, chapter);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByHealth(String sortParam, int page, Long health){
+    public Iterable<SpaceMarine> getPageSpaceMarineByHealth(String sortParam, int page, int size, Long health){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByHealth(pageable, health);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByCategory(String sortParam, int page, AstartesCategory category){
-        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
-        return spaceRepository.findAllByCategory(pageable, category);
-    }
-
-    public Iterable<SpaceMarine> getPageSpaceMarineByWeaponType(String sortParam, int page, Weapon weaponType){
-        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
-        return spaceRepository.findAllByWeaponType(pageable, weaponType);
-    }
-    public Iterable<SpaceMarine> getPageSpaceMarineByMeleeWeapon(String sortParam, int page, MeleeWeapon meleeWeapon){
-        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-        Pageable pageable = PageRequest.of(page, 10, sort);
-        return spaceRepository.findAllByMeleeWeapon(pageable, meleeWeapon);
-    }
+//    public Iterable<SpaceMarine> getPageSpaceMarineByCategory(String sortParam, int page, AstartesCategory category){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return spaceRepository.findAllByCategory(pageable, category);
+//    }
+//
+//    public Iterable<SpaceMarine> getPageSpaceMarineByWeaponType(String sortParam, int page, Weapon weaponType){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return spaceRepository.findAllByWeaponType(pageable, weaponType);
+//    }
+//    public Iterable<SpaceMarine> getPageSpaceMarineByMeleeWeapon(String sortParam, int page, MeleeWeapon meleeWeapon){
+//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
+//        Pageable pageable = PageRequest.of(page, 10, sort);
+//        return spaceRepository.findAllByMeleeWeapon(pageable, meleeWeapon);
+//    }
 
     public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException{
         var marine = spaceRepository.findById(id);

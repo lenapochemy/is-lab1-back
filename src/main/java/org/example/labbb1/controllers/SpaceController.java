@@ -68,157 +68,56 @@ public class SpaceController {
         }
     }
 
-    @GetMapping()
-    public ResponseEntity<?> getAllSpaceMarineByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if( token == null || token.isEmpty()){
+    @GetMapping(value = {"{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}"})
+    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable String filter_param,
+                                                      @PathVariable(required = false) String filter_value,
+                                                      @PathVariable(required = false) String sort_param,
+                                                      @PathVariable(required = false) Integer page,
+                                                      @PathVariable(required = false) Integer size,
+                                                      @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+        if(token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(!userService.verifyToken(token)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        User user = userService.findUserByToken(token);
-        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarineByUser(user);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllSpaceMarine(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if( token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Iterable<SpaceMarine> spaceMarines;
+        switch (filter_param){
+            case "name":{
+                spaceMarines = spaceService.getPageSpaceMarineByName(sort_param, page, size, filter_value);
+                break;
+            }
+            case "coord":{
+                Coordinates coord = coordinatesService.getCoordById(Long.parseLong(filter_value));
+                spaceMarines = spaceService.getPageSpaceMarineByCoordinates(sort_param, page, size, coord);
+                break;
+            }
+            case "chapter":{
+                Chapter chapter = chapterService.getChapterById(Long.parseLong(filter_value));
+                spaceMarines = spaceService.getPageSpaceMarineByChapter(sort_param, page, size, chapter);
+                break;
+            }
+            case "health": {
+                Long health = Long.parseLong(filter_value);
+                spaceMarines = spaceService.getPageSpaceMarineByHealth(sort_param, page, size, health);
+                break;
+            }
+            case "user":{
+                User user = userService.findUserByToken(token);
+                spaceMarines = spaceService.getAllSpaceMarineByUser(user);
+                break;
+            }
+            case "all": {
+                if(size == null) {
+                    spaceMarines = spaceService.getAllSpaceMarine();
+                } else
+                    spaceMarines = spaceService.getPageSpaceMarine(sort_param, page, size);
+                break;
+            }
+            default:{
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
         }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
-        Iterable<SpaceMarine> spaceMarines = spaceService.getAllSpaceMarine();
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarine(@PathVariable String sort, @PathVariable Integer page,
-                                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarine(sort, page);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byName/{name}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable String name, @PathVariable String sort,
-                                                          @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByName(sort, page, name);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byCoord/{id}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByCoord(@PathVariable Long id, @PathVariable String sort,
-                                                           @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Coordinates coord = coordinatesService.getCoordById(id);
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByCoordinates(sort, page, coord);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byDate/{date}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByDate(@PathVariable LocalDateTime date, @PathVariable String sort,
-                                                          @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByCreationDate(sort, page, date);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-    @GetMapping("byChapter/{id}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByChapter(@PathVariable Long id, @PathVariable String sort,
-                                                             @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Chapter chapter = chapterService.getChapterById(id);
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByChapter(sort, page, chapter);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byHealth/{health}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByHealth(@PathVariable Long health, @PathVariable String sort,
-                                                            @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByHealth(sort, page, health);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byCategory/{category}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable AstartesCategory category, @PathVariable String sort,
-                                                          @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByCategory(sort, page, category);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byWeapon/{weapon}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable Weapon weapon, @PathVariable String sort,
-                                                          @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByWeaponType(sort, page, weapon);
-        attributeToNull(spaceMarines);
-        return ResponseEntity.ok(spaceMarines);
-    }
-
-    @GetMapping("byMeleeWeapon/{weapon}/{sort}/{page}")
-    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable MeleeWeapon weapon, @PathVariable String sort,
-                                                          @PathVariable Integer page, @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<SpaceMarine> spaceMarines = spaceService.getPageSpaceMarineByMeleeWeapon(sort, page, weapon);
         attributeToNull(spaceMarines);
         return ResponseEntity.ok(spaceMarines);
     }
@@ -272,19 +171,23 @@ public class SpaceController {
         }
     }
 
-    private void attributeToNull(Iterable<SpaceMarine> spaceMarines){
-        spaceMarines.forEach(spaceMarine -> {
-            spaceMarine.getCoordinates().setSpaceMarines(null);
-            spaceMarine.getCoordinates().setUser(null);
-            spaceMarine.getChapter().setSpaceMarines(null);
-            spaceMarine.getChapter().setUser(null);
-            spaceMarine.getUser().setChapters(null);
-            spaceMarine.getUser().setCoordinates(null);
-            spaceMarine.getUser().setSpaceMarines(null);
-            spaceMarine.getUser().setId(null);
-            spaceMarine.getUser().setPassword(null);
-        });
+    private void attributeToNull(Iterable<SpaceMarine> spaceMarines) {
+        if (spaceMarines != null) {
+            spaceMarines.forEach(spaceMarine -> {
+                spaceMarine.getCoordinates().setSpaceMarines(null);
+                spaceMarine.getCoordinates().setUser(null);
+                spaceMarine.getChapter().setSpaceMarines(null);
+                spaceMarine.getChapter().setUser(null);
+                spaceMarine.getUser().setChapters(null);
+                spaceMarine.getUser().setCoordinates(null);
+                spaceMarine.getUser().setSpaceMarines(null);
+                spaceMarine.getUser().setId(null);
+                spaceMarine.getUser().setPassword(null);
+                spaceMarine.setEditSpaceMarines(null);
+                spaceMarine.getCoordinates().setEditCoordinates(null);
+                spaceMarine.getChapter().setEditChapters(null);
+            });
+        }
     }
-
 
 }

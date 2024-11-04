@@ -30,9 +30,12 @@ public class Coordinates {
     @ManyToOne
     private User user;
 
-    @CascadeOnDelete
-    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<SpaceMarine> spaceMarines;
+
+
+    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<EditCoordinates> editCoordinates;
 
 //    public void removeSpaceMarine(SpaceMarine spaceMarine){
 //        spaceMarines.remove(spaceMarine);

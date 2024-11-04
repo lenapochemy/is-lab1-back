@@ -50,76 +50,57 @@ public class CoordinatesController {
     }
 
 
-    @GetMapping()
-    public ResponseEntity<?> getAllCoordinatesByUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
+    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "/{filter_param}"})
+    public ResponseEntity<?> getCoordinatesByY(@PathVariable String filter_param,
+                                               @PathVariable(required = false) String filter_value,
+                                               @PathVariable(required = false) String sort_param,
+                                               @PathVariable(required = false) Integer page,
+                                               @PathVariable(required = false) Integer size,
+                                               @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
         if(token == null || token.isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         if(!userService.verifyToken(token)){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
-        User user = userService.findUserByToken(token);
-        Iterable<Coordinates> coords = coordinatesService.getAllCoordinatesByUser(user);
+        Iterable<Coordinates> coords;
+        try {
+            switch (filter_param) {
+                case "x": {
+                    Integer x = Integer.parseInt(filter_value);
+                    coords = coordinatesService.getPageCoordinatesByX(sort_param, page, size, x);
+                    break;
+                }
+                case "y": {
+                    Float y = Float.parseFloat(filter_value);
+                    coords = coordinatesService.getPageCoordinatesByY(sort_param, page, size, y);
+                    break;
+                }
+                case "all": {
+                    if(size == null){
+                        coords = coordinatesService.getAllCoordinates();
+                    } else
+                        coords = coordinatesService.getPageCoordinates(sort_param, page, size);
+                    break;
+                }
+                case "user":{
+                    User user = userService.findUserByToken(token);
+                    coords = coordinatesService.getAllCoordinatesByUser(user);
+                    break;
+                }
+                default: {
+                    return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+                }
+            }
+        } catch (NumberFormatException e){
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         attributeToNull(coords);
         return ResponseEntity.ok(coords);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllCoordinates(@RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        User user = userService.findUserByToken(token);
-        Iterable<Coordinates> coords = coordinatesService.getAllCoordinates();
-        attributeToNull(coords);
-        return ResponseEntity.ok(coords);
-    }
 
-    @GetMapping("/{sort}/{page}")
-    public ResponseEntity<?> getCoordinates(@PathVariable String sort, @PathVariable Integer page,
-                                                @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-//        User user = userService.filndUserByToken(token);
-        Iterable<Coordinates> coords = coordinatesService.getPageCoordinates(sort, page);
-        attributeToNull(coords);
-        return  ResponseEntity.ok(coords);
-    }
 
-    @GetMapping("/byX/{x}/{sort}/{page}")
-    public ResponseEntity<?> getCoordinatesByX( @PathVariable Integer x, @PathVariable String sort, @PathVariable Integer page,
-                                                    @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<Coordinates> coords = coordinatesService.getPageCoordinatesByX(sort, page, x);
-        attributeToNull(coords);
-        return ResponseEntity.ok(coords);
-    }
-
-    @GetMapping("/byY/{y}/{sort}/{page}")
-    public ResponseEntity<?> getCoordinatesByY(@PathVariable Float y, @PathVariable String sort, @PathVariable Integer page,
-                                                   @RequestHeader(HttpHeaders.AUTHORIZATION) String token){
-        if(sort == null || page == null || token == null || token.isEmpty()){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        if(!userService.verifyToken(token)){
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        Iterable<Coordinates> coords = coordinatesService.getPageCoordinatesByY(sort, page, y);
-        attributeToNull(coords);
-        return ResponseEntity.ok(coords);
-    }
 
     @PostMapping("/update")
     public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates,
@@ -167,15 +148,17 @@ public class CoordinatesController {
         }
     }
 
-    private void attributeToNull(Iterable<Coordinates> coords){
-        coords.forEach(coordinates -> {
-            coordinates.setSpaceMarines(null);
-            coordinates.getUser().setPassword(null);
-            coordinates.getUser().setCoordinates(null);
-            coordinates.getUser().setId(null);
-            coordinates.getUser().setChapters(null);
-            coordinates.getUser().setSpaceMarines(null);
-        });
+    private void attributeToNull(Iterable<Coordinates> coords) {
+        if (coords != null) {
+            coords.forEach(coordinates -> {
+                coordinates.setSpaceMarines(null);
+                coordinates.getUser().setPassword(null);
+                coordinates.getUser().setCoordinates(null);
+                coordinates.getUser().setId(null);
+                coordinates.getUser().setChapters(null);
+                coordinates.getUser().setSpaceMarines(null);
+                coordinates.setEditCoordinates(null);
+            });
+        }
     }
-
 }
