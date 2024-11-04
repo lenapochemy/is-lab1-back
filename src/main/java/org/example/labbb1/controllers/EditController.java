@@ -48,6 +48,7 @@ public class EditController {
             editChapter.getUser().setId(null);
             editChapter.getChapter().setUser(null);
             editChapter.getChapter().setSpaceMarines(null);
+            editChapter.getChapter().setEditChapters(null);
         });
         return ResponseEntity.ok(chapters);
     }
@@ -71,6 +72,7 @@ public class EditController {
             editCoordinates.getUser().setId(null);
             editCoordinates.getCoordinates().setUser(null);
             editCoordinates.getCoordinates().setSpaceMarines(null);
+            editCoordinates.getCoordinates().setEditCoordinates(null);
         });
         return ResponseEntity.ok(coords);
     }
@@ -96,6 +98,10 @@ public class EditController {
             editSpaceMarine.getSpaceMarine().getCoordinates().setUser(null);
             editSpaceMarine.getSpaceMarine().getCoordinates().setSpaceMarines(null);
             editSpaceMarine.getSpaceMarine().getChapter().setSpaceMarines(null);
+            editSpaceMarine.getSpaceMarine().getChapter().setUser(null);
+            editSpaceMarine.getSpaceMarine().setEditSpaceMarines(null);
+            editSpaceMarine.getSpaceMarine().getChapter().setEditChapters(null);
+            editSpaceMarine.getSpaceMarine().getCoordinates().setEditCoordinates(null);
         });
 
         return ResponseEntity.ok(spaceMarines);
