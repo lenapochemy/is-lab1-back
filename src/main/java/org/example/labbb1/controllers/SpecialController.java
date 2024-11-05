@@ -92,8 +92,8 @@ public class SpecialController {
 //        if(!userService.verifyToken(token)){
 //            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 //        }
-//        User user = userService.findUserByToken();
-        if(specialService.marineToChapter(spaceMarine, id)) {
+        User user = userService.findUserByToken();
+        if(specialService.marineToChapter(spaceMarine, id, user)) {
             return new ResponseEntity<>(HttpStatus.OK);
         } else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

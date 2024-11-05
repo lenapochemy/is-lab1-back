@@ -53,7 +53,7 @@ public class UserController {
     }
 
 
-    @GetMapping("/admin/role")
+    @GetMapping("/role")
     public ResponseEntity<?> getRole(){
 //        if(token == null || token.isEmpty()){
 //            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -66,7 +66,7 @@ public class UserController {
         return ResponseEntity.ok(user.getRole());
     }
 
-    @PostMapping("/admin/become")
+    @PostMapping("/becomeAdmin")
     public ResponseEntity<?> becomeAdmin(){
 //        if(token == null || token.isEmpty()){
 //            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -88,6 +88,7 @@ public class UserController {
         }
     }
 
+    @RolesAllowed("APPROVED_ADMIN")
     @PostMapping("/admin/approve/{id}")
     public ResponseEntity<?> approveAdmin(@PathVariable Integer id){
 //        if(id == null || token == null || token.isEmpty()){

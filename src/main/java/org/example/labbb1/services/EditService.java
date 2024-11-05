@@ -27,9 +27,37 @@ public class EditService {
         return editChapterRepository.findAllByChapter(chapter);
     }
 
+    public void addNewEditChapter(Chapter chapter, User user, EditType editType){
+        EditChapter editChapter = new EditChapter();
+        editChapter.setChapter(chapter);
+        editChapter.setType(editType);
+        editChapter.setUser(user);
+        editChapter.setDate(LocalDateTime.now());
+        editChapterRepository.save(editChapter);
+    }
+
+    public void addNewEditCoord(Coordinates coord, User user, EditType editType){
+        EditCoordinates editCoordinates = new EditCoordinates();
+        editCoordinates.setCoordinates(coord);
+        editCoordinates.setType(editType);
+        editCoordinates.setUser(user);
+        editCoordinates.setDate(LocalDateTime.now());
+
+    }
+
+    public void addNewEditSpaceMarine(SpaceMarine spaceMarine , User user, EditType editType){
+        EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
+        editSpaceMarine.setSpaceMarine(spaceMarine);
+        editSpaceMarine.setType(editType);
+        editSpaceMarine.setUser(user);
+        editSpaceMarine.setDate(LocalDateTime.now());
+    }
+
+
     public Iterable<EditCoordinates> getEditCoordByCoords(Coordinates coordinates){
         return editCoordinatesRepository.findAllByCoordinates(coordinates);
     }
+
 
     public Iterable<EditSpaceMarine> getEditSpaceMarineBySPaceMarine(SpaceMarine spaceMarine){
         return editSpaceMarineRepository.findAllBySpaceMarine(spaceMarine);

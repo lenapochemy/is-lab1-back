@@ -31,6 +31,7 @@ public class CoordinatesService {
 
     public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
         coordinatesRepository.save(coordinates);
+//        editService.addNewEditCoord(coordinates, coordinates.getUser(), EditType.CREATE);
         EditCoordinates editCoordinates = new EditCoordinates();
         editCoordinates.setCoordinates(coordinates);
         editCoordinates.setType(EditType.CREATE);
@@ -45,12 +46,15 @@ public class CoordinatesService {
             Coordinates coordinates1 = coord.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     coordinates1.getUser().getId().equals(user.getId())) {
-                coordinates.setUser(user);
-                coordinatesRepository.save(coordinates);
+//                coordinates.setUser(user);
+                coordinates1.setX(coordinates.getX());
+                coordinates1.setY(coordinates.getY());
+                coordinatesRepository.save(coordinates1);
+//                editService.addNewEditCoord(coordinates1, user, EditType.UPDATE);
                 EditCoordinates editCoordinates = new EditCoordinates();
                 editCoordinates.setCoordinates(coordinates1);
                 editCoordinates.setType(EditType.UPDATE);
-                editCoordinates.setUser(coordinates1.getUser());
+                editCoordinates.setUser(user);
                 editCoordinates.setDate(LocalDateTime.now());
                 editCoordinatesRepository.save(editCoordinates);
                 return true;

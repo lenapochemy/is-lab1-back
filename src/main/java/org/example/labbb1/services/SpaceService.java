@@ -50,12 +50,20 @@ public class SpaceService {
             SpaceMarine spaceMarine1 = marine.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     spaceMarine1.getUser().getId().equals(user.getId())){
-                spaceMarine.setUser(spaceMarine1.getUser());
-                spaceRepository.save(spaceMarine);
+//                spaceMarine.setUser(spaceMarine1.getUser());
+                spaceMarine1.setName(spaceMarine.getName());
+                spaceMarine1.setCoordinates(spaceMarine.getCoordinates());
+                spaceMarine1.setChapter(spaceMarine.getChapter());
+                spaceMarine1.setHealth(spaceMarine.getHealth());
+                spaceMarine1.setCategory(spaceMarine.getCategory());
+                spaceMarine1.setWeaponType(spaceMarine.getWeaponType());
+                spaceMarine1.setMeleeWeapon(spaceMarine.getMeleeWeapon());
+
+                spaceRepository.save(spaceMarine1);
                 EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
-                editSpaceMarine.setSpaceMarine(spaceMarine);
+                editSpaceMarine.setSpaceMarine(spaceMarine1);
                 editSpaceMarine.setType(EditType.UPDATE);
-                editSpaceMarine.setUser(spaceMarine.getUser());
+                editSpaceMarine.setUser(user);
                 editSpaceMarine.setDate(LocalDateTime.now());
                 editSpaceMarineRepository.save(editSpaceMarine);
                 return true;

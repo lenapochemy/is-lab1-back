@@ -53,12 +53,16 @@ public class ChapterService {
             Chapter chapter1 = chap.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     chapter1.getUser().getId().equals(user.getId())) {
-                chapter.setUser(user);
+//                chapter.setUser(user);
+                chapter1.setName(chapter.getName());
+                chapter1.setParentLegion(chapter.getParentLegion());
                 chapterRepository.save(chapter);
+
+
                 EditChapter editChapter = new EditChapter();
                 editChapter.setChapter(chapter1);
                 editChapter.setType(EditType.UPDATE);
-                editChapter.setUser(chapter1.getUser());
+                editChapter.setUser(user);
                 editChapter.setDate(LocalDateTime.now());
                 editChapterRepository.save(editChapter);
                 return true;

@@ -73,11 +73,11 @@ public class SpecialService {
         chapterRepository.save(chapter);
     }
 
-    public boolean marineToChapter(SpaceMarine marine, Long chapterId){
+    public boolean marineToChapter(SpaceMarine marine, Long chapterId, User user){
         var chapter = chapterRepository.findById(chapterId);
         if(chapter.isPresent()) {
             marine.setChapter(chapter.get());
-//            marine.setUser(user);
+            marine.setUser(user);
             spaceRepository.save(marine);
             return true;
         } else
