@@ -1,19 +1,14 @@
 package org.example.labbb1.controllers;
 
 
-import jakarta.json.JsonArrayBuilder;
-import jakarta.json.Json;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.ChapterService;
 import org.example.labbb1.services.CoordinatesService;
 import org.example.labbb1.services.SpaceService;
 import org.example.labbb1.services.UserService;
-import org.example.labbb1.model.AstartesCategory;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,9 +50,6 @@ public class SpaceController {
                 spaceMarine.getCategory() == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         User user = userService.findUserByToken();
         spaceMarine.setUser(user);
         try{
@@ -75,12 +67,6 @@ public class SpaceController {
                                                       @PathVariable(required = false) String sort_param,
                                                       @PathVariable(required = false) Integer page,
                                                       @PathVariable(required = false) Integer size){
-//        if(token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         Iterable<SpaceMarine> spaceMarines;
         switch (filter_param){
             case "name":{
@@ -107,9 +93,7 @@ public class SpaceController {
                 spaceMarines = spaceService.getAllSpaceMarineByUser(user);
                 if(filter_value != null){
                     List<Long> spaceMarinesId = new ArrayList<>();
-                    spaceMarines.forEach(spaceMarine -> {
-                        spaceMarinesId.add(spaceMarine.getId());
-                    });
+                    spaceMarines.forEach(spaceMarine -> spaceMarinesId.add(spaceMarine.getId()));
                     return ResponseEntity.ok(spaceMarinesId);
                 }
                 break;
@@ -141,9 +125,6 @@ public class SpaceController {
                 spaceMarine.getCategory() == null || spaceMarine1 == null ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         try{
             spaceMarine.setCreationDate(LocalDateTime.now());
             User user = userService.findUserByToken();
@@ -159,12 +140,6 @@ public class SpaceController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSpaceMarine(@PathVariable Long id){
-//        if(token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         User user = userService.findUserByToken();
         try {
             if (spaceService.deleteSpaceMarine(id, user)) {

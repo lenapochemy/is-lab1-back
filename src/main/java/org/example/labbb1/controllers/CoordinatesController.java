@@ -7,7 +7,6 @@ import org.example.labbb1.services.CoordinatesService;
 import org.example.labbb1.services.UserService;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,9 +33,6 @@ public class CoordinatesController {
         if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         User user = userService.findUserByToken();
 
         coordinates.setUser(user);
@@ -55,12 +51,6 @@ public class CoordinatesController {
                                                @PathVariable(required = false) String sort_param,
                                                @PathVariable(required = false) Integer page,
                                                @PathVariable(required = false) Integer size){
-//        if(token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         Iterable<Coordinates> coords;
         try {
             switch (filter_param) {
@@ -86,9 +76,7 @@ public class CoordinatesController {
                     coords = coordinatesService.getAllCoordinatesByUser(user);
                     if(filter_value != null){
                         List<Long> coordsId = new ArrayList<>();
-                        coords.forEach(coordinates -> {
-                            coordsId.add(coordinates.getId());
-                        });
+                        coords.forEach(coordinates -> coordsId.add(coordinates.getId()));
                         return ResponseEntity.ok(coordsId);
                     }
                     break;
@@ -109,13 +97,9 @@ public class CoordinatesController {
 
     @PostMapping("/update")
     public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
-        Coordinates coordinates1 = coordinatesService.getCoordById(coordinates.getId());
         if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        i(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }f
         try {
             User user = userService.findUserByToken();
             if(coordinatesService.updateCoordinate(coordinates, user)) {
@@ -133,12 +117,6 @@ public class CoordinatesController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCoord(@PathVariable Long id){
-//        if(token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         User user = userService.findUserByToken();
         try{
             if(coordinatesService.deleteCoord(id, user)) {

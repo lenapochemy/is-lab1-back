@@ -3,8 +3,6 @@ package org.example.labbb1.controllers;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,16 +12,14 @@ import org.springframework.web.bind.annotation.*;
 public class EditController {
 
     private final EditService editService;
-    private final UserService userService;
     private final ChapterService chapterService;
     private final CoordinatesService coordinatesService;
     private final SpaceService spaceService;
 
     @Autowired
-    public EditController(EditService editService, UserService userService, ChapterService chapterService,
+    public EditController(EditService editService, ChapterService chapterService,
                           CoordinatesService coordinatesService, SpaceService spaceService){
         this.editService = editService;
-        this.userService = userService;
         this.chapterService = chapterService;
         this.coordinatesService = coordinatesService;
         this.spaceService = spaceService;
@@ -31,12 +27,6 @@ public class EditController {
 
     @GetMapping("/chapter/{id}")
     public ResponseEntity<?> getEditChapters(@PathVariable Long id){
-//        if(id == null || token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         Chapter chapter = chapterService.getChapterById(id);
         Iterable<EditChapter> chapters = editService.getEditChapterByChapter(chapter);
         chapters.forEach(editChapter -> {
@@ -54,12 +44,6 @@ public class EditController {
 
     @GetMapping("/coord/{id}")
     public ResponseEntity<?> getEditCoords(@PathVariable Long id){
-//        if(id == null || token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         Coordinates coordinates = coordinatesService.getCoordById(id);
         Iterable<EditCoordinates> coords = editService.getEditCoordByCoords(coordinates);
         coords.forEach(editCoordinates -> {
@@ -78,12 +62,6 @@ public class EditController {
     @GetMapping("/spaceMarine/{id}")
     public ResponseEntity<?> getEditSpaceMarine(
                                              @PathVariable Long id){
-//        if(id == null || token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         SpaceMarine spaceMarine = spaceService.getSpaceMarine(id);
         Iterable<EditSpaceMarine> spaceMarines = editService.getEditSpaceMarineBySPaceMarine(spaceMarine);
         spaceMarines.forEach(editSpaceMarine -> {

@@ -4,11 +4,9 @@ import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.User;
 import org.example.labbb1.services.ChapterService;
-import org.example.labbb1.services.EditService;
 import org.example.labbb1.services.UserService;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,13 +21,10 @@ public class ChapterController {
 
     private final ChapterService chapterService;
     private final UserService userService;
-    private final EditService editService;
     @Autowired
-    public ChapterController(ChapterService chapterService, UserService userService,
-                             EditService editService) {
+    public ChapterController(ChapterService chapterService, UserService userService) {
         this.chapterService = chapterService;
         this.userService = userService;
-        this.editService = editService;
     }
 
     @PostMapping("/create")
@@ -37,14 +32,10 @@ public class ChapterController {
         if(chapter.getName() == null ||chapter.getName().isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         User user = userService.findUserByToken();
         chapter.setUser(user);
         try {
             chapterService.addNewChapter(chapter);
-//            editService.addNewEditChapterOnCreate(chapter.getName());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -57,9 +48,6 @@ public class ChapterController {
         if(chapter.getName() == null ||chapter.getName().isEmpty() || chapter1 == null ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
         try {
             User user = userService.findUserByToken();
             if(chapterService.updateChapter(chapter, user)){
@@ -80,13 +68,6 @@ public class ChapterController {
                                                        @PathVariable(required = false) String sort_param,
                                                        @PathVariable(required = false) Integer page,
                                                        @PathVariable(required = false) Integer size){
-//        if(token == null || token.isEmpty()){
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        }
-//        if(!userService.verifyToken(token)){
-//            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//        }
-
         Iterable<Chapter> chapters;
         switch (filter_param){
             case "name":{
@@ -102,9 +83,7 @@ public class ChapterController {
                 chapters = chapterService.getAllChaptersByUser(user);
                 if(filter_value != null){
                     List<Long> chaptersId = new ArrayList<>();
-                    chapters.forEach(chapter -> {
-                        chaptersId.add(chapter.getId());
-                    });
+                    chapters.forEach(chapter -> chaptersId.add(chapter.getId()));
                     return ResponseEntity.ok(chaptersId);
                 }
                 break;

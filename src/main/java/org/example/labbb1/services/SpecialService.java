@@ -6,13 +6,11 @@ import org.example.labbb1.model.MeleeWeapon;
 import org.example.labbb1.model.SpaceMarine;
 import org.example.labbb1.model.User;
 import org.example.labbb1.repositories.ChapterRepository;
-import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -66,9 +64,6 @@ public class SpecialService {
     }
 
     public void saveNewChapter(Chapter chapter, User user){
-//        Chapter chapter = new Chapter();
-//        chapter.setName(name);
-//        chapter.setParentLegion(parentLegion);
         chapter.setUser(user);
         chapterRepository.save(chapter);
     }

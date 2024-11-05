@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 import java.util.List;
 
@@ -35,10 +34,5 @@ public class Coordinates {
 
     @OneToMany(mappedBy = "coordinates", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EditCoordinates> editCoordinates;
-
-//    public void removeSpaceMarine(SpaceMarine spaceMarine){
-//        spaceMarines.remove(spaceMarine);
-//        spaceMarine.setCoordinates(null);
-//    }
 
 }

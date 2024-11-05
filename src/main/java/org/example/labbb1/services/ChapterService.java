@@ -3,9 +3,7 @@ package org.example.labbb1.services;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
-import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.EditChapterRepository;
-import org.example.labbb1.repositories.SpaceRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -53,7 +51,6 @@ public class ChapterService {
             Chapter chapter1 = chap.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     chapter1.getUser().getId().equals(user.getId())) {
-//                chapter.setUser(user);
                 chapter1.setName(chapter.getName());
                 chapter1.setParentLegion(chapter.getParentLegion());
                 chapterRepository.save(chapter);

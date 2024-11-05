@@ -1,24 +1,17 @@
 package org.example.labbb1.services;
 
-import jakarta.transaction.Transactional;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
-import org.example.labbb1.repositories.ChapterRepository;
-import org.example.labbb1.repositories.CoordinatesRepository;
 import org.example.labbb1.repositories.EditSpaceMarineRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SpaceService {
@@ -50,7 +43,7 @@ public class SpaceService {
             SpaceMarine spaceMarine1 = marine.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     spaceMarine1.getUser().getId().equals(user.getId())){
-//                spaceMarine.setUser(spaceMarine1.getUser());
+
                 spaceMarine1.setName(spaceMarine.getName());
                 spaceMarine1.setCoordinates(spaceMarine.getCoordinates());
                 spaceMarine1.setChapter(spaceMarine.getChapter());
@@ -110,11 +103,6 @@ public class SpaceService {
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByCoordinates(pageable, coordinates);
     }
-//    public Iterable<SpaceMarine> getPageSpaceMarineByCreationDate(String sortParam, int page, int size, LocalDateTime creationDate){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return spaceRepository.findAllByCreationDate(pageable, creationDate);
-//    }
 
     public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, int size, Chapter chapter){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
@@ -127,23 +115,6 @@ public class SpaceService {
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByHealth(pageable, health);
     }
-
-//    public Iterable<SpaceMarine> getPageSpaceMarineByCategory(String sortParam, int page, AstartesCategory category){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return spaceRepository.findAllByCategory(pageable, category);
-//    }
-//
-//    public Iterable<SpaceMarine> getPageSpaceMarineByWeaponType(String sortParam, int page, Weapon weaponType){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return spaceRepository.findAllByWeaponType(pageable, weaponType);
-//    }
-//    public Iterable<SpaceMarine> getPageSpaceMarineByMeleeWeapon(String sortParam, int page, MeleeWeapon meleeWeapon){
-//        Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
-//        Pageable pageable = PageRequest.of(page, 10, sort);
-//        return spaceRepository.findAllByMeleeWeapon(pageable, meleeWeapon);
-//    }
 
     public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException{
         var marine = spaceRepository.findById(id);
