@@ -31,6 +31,11 @@ public class SecurityConfig {
                         .requestMatchers("/").permitAll()
                         .requestMatchers("/user/reg").permitAll()
                         .requestMatchers("/user/logIn").permitAll()
+                        .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/assets/**").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/cat.jpg").permitAll()
+                        .requestMatchers("/cat2.jpg").permitAll()
                         .anyRequest().authenticated())
                 // 401-UNAUTHORIZED when anonymous user tries to access protected URLs
                 .exceptionHandling((handle) -> handle.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) )

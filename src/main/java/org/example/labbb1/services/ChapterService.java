@@ -53,7 +53,7 @@ public class ChapterService {
                     chapter1.getUser().getId().equals(user.getId())) {
                 chapter1.setName(chapter.getName());
                 chapter1.setParentLegion(chapter.getParentLegion());
-                chapterRepository.save(chapter);
+                chapterRepository.save(chapter1);
 
 
                 EditChapter editChapter = new EditChapter();
