@@ -1,6 +1,10 @@
 package org.example.labbb1.services;
 
 
+import org.example.labbb1.dto.ChapterDTO;
+import org.example.labbb1.dto.CoordinatesDTO;
+import org.example.labbb1.dto.SpaceMarineDTO;
+import org.example.labbb1.dto.UserDTO;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.MeleeWeapon;
 import org.example.labbb1.model.SpaceMarine;
@@ -26,7 +30,7 @@ public class SpecialService {
         this.chapterRepository = chapterRepository;
     }
 
-    public SpaceMarine getSpaceMarineWithMinChapter(){
+    public SpaceMarineDTO getSpaceMarineWithMinChapter(){
         Long minChapterId = Long.MAX_VALUE;
         SpaceMarine spaceMarine = null;
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
@@ -36,10 +40,11 @@ public class SpecialService {
                 spaceMarine = marine;
             }
         }
-        return spaceMarine;
+
+        return spaceMarineToDTO(spaceMarine);
     }
 
-    public List<SpaceMarine> getSpaceMarinesWithNameStart(String string){
+    public List<SpaceMarineDTO> getSpaceMarinesWithNameStart(String string){
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
         List<SpaceMarine> spaceMarines = new ArrayList<>();
         for(SpaceMarine marine : spaceMarineList){
@@ -47,10 +52,10 @@ public class SpecialService {
                 spaceMarines.add(marine);
             }
         }
-        return spaceMarines;
+        return spaceMarineToDTOs(spaceMarines);
     }
 
-    public List<SpaceMarine> getSpaceMarinesWithGreaterMeleeWeapon(MeleeWeapon meleeWeapon){
+    public List<SpaceMarineDTO> getSpaceMarinesWithGreaterMeleeWeapon(MeleeWeapon meleeWeapon){
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
         List<SpaceMarine> spaceMarines = new ArrayList<>();
         for(SpaceMarine marine : spaceMarineList){
@@ -60,23 +65,49 @@ public class SpecialService {
                 }
             }
         }
-        return spaceMarines;
+        return spaceMarineToDTOs(spaceMarines);
     }
 
-    public void saveNewChapter(Chapter chapter, User user){
+    public void saveNewChapter(ChapterDTO chapterDTO, User user){
+        Chapter chapter = new Chapter();
+        chapter.setName(chapterDTO.getName());
+        chapter.setParentLegion(chapterDTO.getParentLegion());
         chapter.setUser(user);
         chapterRepository.save(chapter);
     }
 
-    public boolean marineToChapter(SpaceMarine marine, Long chapterId, User user){
+    public boolean marineToChapter(SpaceMarineDTO marine, Long chapterId, User user){
         var chapter = chapterRepository.findById(chapterId);
         if(chapter.isPresent()) {
-            marine.setChapter(chapter.get());
-            marine.setUser(user);
-            spaceRepository.save(marine);
+            var varSpaceMarine = spaceRepository.findById(marine.getId());
+            if(varSpaceMarine.isPresent()){
+                SpaceMarine spaceMarine = varSpaceMarine.get();
+                spaceMarine.setChapter(chapter.get());
+                spaceMarine.setUser(user);
+                spaceRepository.save(spaceMarine);
+            }
             return true;
         } else
             return false;
+    }
+
+    private SpaceMarineDTO spaceMarineToDTO(SpaceMarine spaceMarine){
+        CoordinatesDTO coordinatesDTO = new CoordinatesDTO(spaceMarine.getCoordinates().getId(),
+                spaceMarine.getCoordinates().getX(), spaceMarine.getCoordinates().getY(), null);
+        ChapterDTO chapterDTO = new ChapterDTO(spaceMarine.getChapter().getId(),
+                spaceMarine.getChapter().getName(), spaceMarine.getChapter().getParentLegion(), null);
+        UserDTO userDTO = new UserDTO(spaceMarine.getUser().getId(), spaceMarine.getUser().getLogin());
+        return new SpaceMarineDTO(
+                spaceMarine.getId(), spaceMarine.getName(), coordinatesDTO, spaceMarine.getCreationDate(),
+                chapterDTO, spaceMarine.getHealth(), spaceMarine.getCategory(), spaceMarine.getWeaponType(),
+                spaceMarine.getMeleeWeapon(), userDTO
+        );
+    }
+
+    private List<SpaceMarineDTO> spaceMarineToDTOs(Iterable<SpaceMarine> spaceMarines){
+        List<SpaceMarineDTO> spaceMarineDTOS = new ArrayList<>();
+        spaceMarines.forEach(marine -> spaceMarineDTOS.add(spaceMarineToDTO(marine)));
+        return spaceMarineDTOS;
     }
 
 }

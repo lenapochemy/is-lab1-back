@@ -1,5 +1,9 @@
 package org.example.labbb1.controllers;
 
+import org.example.labbb1.dto.ChapterDTO;
+import org.example.labbb1.dto.CoordinatesDTO;
+import org.example.labbb1.dto.SpaceMarineDTO;
+import org.example.labbb1.dto.UserDTO;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.MeleeWeapon;
 import org.example.labbb1.model.SpaceMarine;
@@ -29,37 +33,37 @@ public class SpecialController {
 
     @GetMapping("/minChapter")
     public ResponseEntity<?> getSpaceMarineWithMinChapter(){
-        SpaceMarine spaceMarine = specialService.getSpaceMarineWithMinChapter();
-        attrToNull(spaceMarine);
+        SpaceMarineDTO spaceMarine = specialService.getSpaceMarineWithMinChapter();
+//        attrToNull(spaceMarine);
         return ResponseEntity.ok(spaceMarine);
     }
 
     @GetMapping("/nameStart/{name}")
     public ResponseEntity<?> getSpaceMarineWithNameStart(@PathVariable String name){
-        List<SpaceMarine> spaceMarines = specialService.getSpaceMarinesWithNameStart(name);
-        spaceMarines.forEach(this::attrToNull);
+        List<SpaceMarineDTO> spaceMarines = specialService.getSpaceMarinesWithNameStart(name);
+//        spaceMarines.forEach(this::attrToNull);
         return ResponseEntity.ok(spaceMarines);
     }
 
 
     @GetMapping("/greaterMeleeWeapon/{weapon}")
     public ResponseEntity<?> getSpaceMarineWithGreaterMeleeWeapon(@PathVariable MeleeWeapon weapon){
-        List<SpaceMarine> spaceMarines = specialService.getSpaceMarinesWithGreaterMeleeWeapon(weapon);
-        spaceMarines.forEach(this::attrToNull);
+        List<SpaceMarineDTO> spaceMarines = specialService.getSpaceMarinesWithGreaterMeleeWeapon(weapon);
+//        spaceMarines.forEach(this::attrToNull);
         return ResponseEntity.ok(spaceMarines);
     }
 
     @PostMapping("/newChapter")
-    public ResponseEntity<?> createNewChapter(@RequestBody Chapter chapter){
+    public ResponseEntity<?> createNewChapter(@RequestBody ChapterDTO chapter){
         User user = userService.findUserByToken();
-        System.out.println(chapter.getName());
-        System.out.println(chapter.getParentLegion());
+//        System.out.println(chapter.getName());
+//        System.out.println(chapter.getParentLegion());
         specialService.saveNewChapter(chapter, user);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/spaceMarineToChapter/{id}")
-    public ResponseEntity<?> spaceMarineToChapter(@RequestBody SpaceMarine spaceMarine, @PathVariable Long id){
+    public ResponseEntity<?> spaceMarineToChapter(@RequestBody SpaceMarineDTO spaceMarine, @PathVariable Long id){
         User user = userService.findUserByToken();
         if(specialService.marineToChapter(spaceMarine, id, user)) {
             return new ResponseEntity<>(HttpStatus.OK);
@@ -67,14 +71,15 @@ public class SpecialController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    private void attrToNull(SpaceMarine spaceMarine){
-        spaceMarine.setUser(null);
-        spaceMarine.getCoordinates().setUser(null);
-        spaceMarine.getCoordinates().setSpaceMarines(null);
-        spaceMarine.getChapter().setUser(null);
-        spaceMarine.getChapter().setSpaceMarines(null);
-        spaceMarine.setEditSpaceMarines(null);
-        spaceMarine.getChapter().setEditChapters(null);
-        spaceMarine.getCoordinates().setEditCoordinates(null);
-    }
+//    private void attrToNull(SpaceMarine spaceMarine){
+//        spaceMarine.setUser(null);
+//        spaceMarine.getCoordinates().setUser(null);
+//        spaceMarine.getCoordinates().setSpaceMarines(null);
+//        spaceMarine.getChapter().setUser(null);
+//        spaceMarine.getChapter().setSpaceMarines(null);
+//        spaceMarine.setEditSpaceMarines(null);
+//        spaceMarine.getChapter().setEditChapters(null);
+//        spaceMarine.getCoordinates().setEditCoordinates(null);
+//    }
+
 }

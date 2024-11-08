@@ -1,6 +1,7 @@
 package org.example.labbb1.controllers;
 
 
+import org.example.labbb1.dto.SpaceMarineDTO;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.ChapterService;
@@ -42,19 +43,19 @@ public class SpaceController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createNewSpaceMarine(@RequestBody SpaceMarine spaceMarine){
+    public ResponseEntity<?> createNewSpaceMarine(@RequestBody SpaceMarineDTO spaceMarine){
         if (spaceMarine.getName().isEmpty() ||
-                spaceMarine.getCoordinates() == null ||
-                spaceMarine.getChapter() == null ||
+                spaceMarine.getCoordinatesDTO() == null ||
+                spaceMarine.getChapterDTO() == null ||
                 spaceMarine.getHealth() <= 0 ||
                 spaceMarine.getCategory() == null){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User user = userService.findUserByToken();
-        spaceMarine.setUser(user);
+//        spaceMarine.setUser(user);
         try{
             spaceMarine.setCreationDate(LocalDateTime.now());
-            spaceService.addNewSpaceMarine(spaceMarine);
+            spaceService.addNewSpaceMarine(spaceMarine, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -67,6 +68,21 @@ public class SpaceController {
                                                       @PathVariable(required = false) String sort_param,
                                                       @PathVariable(required = false) Integer page,
                                                       @PathVariable(required = false) Integer size){
+        if(size == null) {
+            Iterable<SpaceMarineDTO> spaceMarines;
+            if(filter_param == "all"){
+                spaceMarines = spaceService.getAllSpaceMarine();
+            } else {
+                User user = userService.findUserByToken();
+                spaceMarines = spaceService.getAllSpaceMarineByUser(user);
+                if(filter_value != null){
+                    List<Long> spaceMarinesId = new ArrayList<>();
+                    spaceMarines.forEach(spaceMarine -> spaceMarinesId.add(spaceMarine.getId()));
+                    return ResponseEntity.ok(spaceMarinesId);
+                }
+            }
+            return ResponseEntity.ok(spaceMarines);
+        }
         Iterable<SpaceMarine> spaceMarines;
         switch (filter_param){
             case "name":{
@@ -88,21 +104,8 @@ public class SpaceController {
                 spaceMarines = spaceService.getPageSpaceMarineByHealth(sort_param, page, size, health);
                 break;
             }
-            case "user":{
-                User user = userService.findUserByToken();
-                spaceMarines = spaceService.getAllSpaceMarineByUser(user);
-                if(filter_value != null){
-                    List<Long> spaceMarinesId = new ArrayList<>();
-                    spaceMarines.forEach(spaceMarine -> spaceMarinesId.add(spaceMarine.getId()));
-                    return ResponseEntity.ok(spaceMarinesId);
-                }
-                break;
-            }
             case "all": {
-                if(size == null) {
-                    spaceMarines = spaceService.getAllSpaceMarine();
-                } else
-                    spaceMarines = spaceService.getPageSpaceMarine(sort_param, page, size);
+                spaceMarines = spaceService.getPageSpaceMarine(sort_param, page, size);
                 break;
             }
             default:{
@@ -116,11 +119,11 @@ public class SpaceController {
 
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateSpaceMarine(@RequestBody SpaceMarine spaceMarine){
+    public ResponseEntity<?> updateSpaceMarine(@RequestBody SpaceMarineDTO spaceMarine){
         SpaceMarine spaceMarine1 = spaceService.getSpaceMarine(spaceMarine.getId());
         if (spaceMarine.getName().isEmpty() ||
-                spaceMarine.getCoordinates() == null ||
-                spaceMarine.getChapter() == null ||
+                spaceMarine.getCoordinatesDTO() == null ||
+                spaceMarine.getChapterDTO() == null ||
                 spaceMarine.getHealth() <= 0 ||
                 spaceMarine.getCategory() == null || spaceMarine1 == null ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

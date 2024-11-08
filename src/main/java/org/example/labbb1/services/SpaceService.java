@@ -1,5 +1,9 @@
 package org.example.labbb1.services;
 
+import org.example.labbb1.dto.ChapterDTO;
+import org.example.labbb1.dto.CoordinatesDTO;
+import org.example.labbb1.dto.SpaceMarineDTO;
+import org.example.labbb1.dto.UserDTO;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.EditSpaceMarineRepository;
@@ -12,6 +16,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SpaceService {
@@ -27,7 +33,26 @@ public class SpaceService {
     }
 
 
-    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
+    public void addNewSpaceMarine(SpaceMarineDTO spaceMarineDTO, User user) throws PSQLException{
+//        Coordinates coordinates = new Coordinates();
+//        coordinates.setX(spaceMarineDTO.getCoordinatesDTO().getX());
+//        coordinates.setY(spaceMarineDTO.getCoordinatesDTO().getY());
+//
+//        Chapter chapter = new Chapter();
+//        chapter.setName(spaceMarineDTO.getChapterDTO().getName());
+//        chapter.setParentLegion(spaceMarineDTO.getChapterDTO().getParentLegion());
+//
+//        SpaceMarine spaceMarine = new SpaceMarine();
+//        spaceMarine.setName(spaceMarineDTO.getName());
+//        spaceMarine.setCoordinates(coordinates);
+//        spaceMarine.setChapter(chapter);
+//        spaceMarine.setHealth(spaceMarineDTO.getHealth());
+//        spaceMarine.setCategory(spaceMarineDTO.getCategory());
+//        spaceMarine.setWeaponType(spaceMarineDTO.getWeaponType());
+//        spaceMarine.setMeleeWeapon(spaceMarineDTO.getMeleeWeapon());
+//        spaceMarine.setUser(user);
+        SpaceMarine spaceMarine = spaceMarineFromDTO(spaceMarineDTO, user);
+        spaceMarine.setCreationDate(LocalDateTime.now());
         spaceRepository.save(spaceMarine);
         EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
         editSpaceMarine.setSpaceMarine(spaceMarine);
@@ -37,20 +62,30 @@ public class SpaceService {
         editSpaceMarineRepository.save(editSpaceMarine);
     }
 
-    public boolean updateSpaceMarine(SpaceMarine spaceMarine, User user) throws PSQLException, ForbiddenException{
-        var marine = spaceRepository.findById(spaceMarine.getId());
+    public boolean updateSpaceMarine(SpaceMarineDTO spaceMarineDTO, User user) throws PSQLException, ForbiddenException{
+        var marine = spaceRepository.findById(spaceMarineDTO.getId());
         if(marine.isPresent()){
             SpaceMarine spaceMarine1 = marine.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     spaceMarine1.getUser().getId().equals(user.getId())){
 
-                spaceMarine1.setName(spaceMarine.getName());
-                spaceMarine1.setCoordinates(spaceMarine.getCoordinates());
-                spaceMarine1.setChapter(spaceMarine.getChapter());
-                spaceMarine1.setHealth(spaceMarine.getHealth());
-                spaceMarine1.setCategory(spaceMarine.getCategory());
-                spaceMarine1.setWeaponType(spaceMarine.getWeaponType());
-                spaceMarine1.setMeleeWeapon(spaceMarine.getMeleeWeapon());
+                Coordinates coordinates = new Coordinates();
+                coordinates.setX(spaceMarineDTO.getCoordinatesDTO().getX());
+                coordinates.setY(spaceMarineDTO.getCoordinatesDTO().getY());
+                coordinates.setId(spaceMarineDTO.getCoordinatesDTO().getId());
+
+                Chapter chapter = new Chapter();
+                chapter.setId(spaceMarineDTO.getChapterDTO().getId());
+                chapter.setName(spaceMarineDTO.getChapterDTO().getName());
+                chapter.setParentLegion(spaceMarineDTO.getChapterDTO().getParentLegion());
+
+                spaceMarine1.setName(spaceMarineDTO.getName());
+                spaceMarine1.setCoordinates(coordinates);
+                spaceMarine1.setChapter(chapter);
+                spaceMarine1.setHealth(spaceMarineDTO.getHealth());
+                spaceMarine1.setCategory(spaceMarineDTO.getCategory());
+                spaceMarine1.setWeaponType(spaceMarineDTO.getWeaponType());
+                spaceMarine1.setMeleeWeapon(spaceMarineDTO.getMeleeWeapon());
 
                 spaceRepository.save(spaceMarine1);
                 EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
@@ -81,15 +116,17 @@ public class SpaceService {
         return spaceRepository.findAll(pageable);
     }
 
-    public Iterable<SpaceMarine> getAllSpaceMarineByUser(User user){
+    public Iterable<SpaceMarineDTO> getAllSpaceMarineByUser(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return getAllSpaceMarine();
         }
-        return spaceRepository.findAllByUser(user);
+        Iterable<SpaceMarine> spaceMarines = spaceRepository.findAllByUser(user);
+        return spaceMarinesToDTOs(spaceMarines);
     }
 
-    public Iterable<SpaceMarine> getAllSpaceMarine(){
-        return spaceRepository.findAll();
+    public Iterable<SpaceMarineDTO> getAllSpaceMarine(){
+        Iterable<SpaceMarine> spaceMarines = spaceRepository.findAll();
+        return spaceMarinesToDTOs(spaceMarines);
     }
 
     public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, int size, String name){
@@ -128,6 +165,41 @@ public class SpaceService {
         } else return false;
     }
 
+
+    private SpaceMarine spaceMarineFromDTO(SpaceMarineDTO spaceMarineDTO, User user){
+        Coordinates coordinates = new Coordinates();
+        coordinates.setId(spaceMarineDTO.getCoordinatesDTO().getId());
+
+        Chapter chapter = new Chapter();
+        chapter.setId(spaceMarineDTO.getChapterDTO().getId());
+
+        SpaceMarine spaceMarine = new SpaceMarine();
+        spaceMarine.setName(spaceMarineDTO.getName());
+        spaceMarine.setCoordinates(coordinates);
+        spaceMarine.setChapter(chapter);
+        spaceMarine.setHealth(spaceMarineDTO.getHealth());
+        spaceMarine.setCategory(spaceMarineDTO.getCategory());
+        spaceMarine.setWeaponType(spaceMarineDTO.getWeaponType());
+        spaceMarine.setMeleeWeapon(spaceMarineDTO.getMeleeWeapon());
+        spaceMarine.setUser(user);
+
+        return spaceMarine;
+    }
+
+    private Iterable<SpaceMarineDTO> spaceMarinesToDTOs(Iterable<SpaceMarine> spaceMarines){
+        List<SpaceMarineDTO> dtos = new ArrayList<>();
+        spaceMarines.forEach(marine -> {
+            ChapterDTO chapterDTO = new ChapterDTO(marine.getChapter().getId(), marine.getChapter().getName(),
+                    marine.getChapter().getParentLegion(), null);
+            CoordinatesDTO coordinatesDTO = new CoordinatesDTO(marine.getCoordinates().getId(), marine.getCoordinates().getX(),
+                    marine.getCoordinates().getY(), null);
+            UserDTO userDTO = new UserDTO(marine.getUser().getId(), marine.getUser().getLogin());
+            dtos.add(new SpaceMarineDTO(marine.getId(), marine.getName(), coordinatesDTO, marine.getCreationDate(),
+                    chapterDTO, marine.getHealth(), marine.getCategory(), marine.getWeaponType(), marine.getMeleeWeapon(),
+                    userDTO));
+        });
+        return dtos;
+    }
 
 
 }

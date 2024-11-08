@@ -1,5 +1,7 @@
 package org.example.labbb1.services;
 
+import org.example.labbb1.dto.CoordinatesDTO;
+import org.example.labbb1.dto.UserDTO;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.CoordinatesRepository;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class CoordinatesService {
@@ -29,8 +33,14 @@ public class CoordinatesService {
         return coordinatesRepository.findById(id);
     }
 
-    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
+    public void addNewCoordinate(CoordinatesDTO coordinatesDTO, User user) throws PSQLException {
+        Coordinates coordinates = new Coordinates();
+        coordinates.setX(coordinatesDTO.getX());
+        coordinates.setY(coordinatesDTO.getY());
+        coordinates.setUser(user);
+
         coordinatesRepository.save(coordinates);
+
         EditCoordinates editCoordinates = new EditCoordinates();
         editCoordinates.setCoordinates(coordinates);
         editCoordinates.setType(EditType.CREATE);
@@ -39,15 +49,16 @@ public class CoordinatesService {
         editCoordinatesRepository.save(editCoordinates);
     }
 
-    public boolean updateCoordinate(Coordinates coordinates, User user) throws PSQLException, ForbiddenException{
-        var coord = coordinatesRepository.findById(coordinates.getId());
+    public boolean updateCoordinate(CoordinatesDTO coordinatesDTO, User user) throws PSQLException, ForbiddenException{
+        var coord = coordinatesRepository.findById(coordinatesDTO.getId());
         if(coord.isPresent()) {
             Coordinates coordinates1 = coord.get();
             if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
                     coordinates1.getUser().getId().equals(user.getId())) {
-                coordinates1.setX(coordinates.getX());
-                coordinates1.setY(coordinates.getY());
+                coordinates1.setX(coordinatesDTO.getX());
+                coordinates1.setY(coordinatesDTO.getY());
                 coordinatesRepository.save(coordinates1);
+
                 EditCoordinates editCoordinates = new EditCoordinates();
                 editCoordinates.setCoordinates(coordinates1);
                 editCoordinates.setType(EditType.UPDATE);
@@ -60,15 +71,17 @@ public class CoordinatesService {
     }
 
 
-    public Iterable<Coordinates> getAllCoordinatesByUser(User user){
+    public Iterable<CoordinatesDTO> getAllCoordinatesByUser(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return getAllCoordinates();
         }
-        return coordinatesRepository.findAllByUser(user);
+        Iterable<Coordinates> coords = coordinatesRepository.findAllByUser(user);
+        return coordsToDTOs(coords);
     }
 
-    public Iterable<Coordinates> getAllCoordinates(){
-        return coordinatesRepository.findAll();
+    public Iterable<CoordinatesDTO> getAllCoordinates(){
+        Iterable<Coordinates> coords = coordinatesRepository.findAll();
+        return coordsToDTOs(coords);
     }
 
     public Iterable<Coordinates> getPageCoordinates(String sortParam, int page, int size){
@@ -101,4 +114,10 @@ public class CoordinatesService {
         } else return false;
     }
 
+    private Iterable<CoordinatesDTO> coordsToDTOs(Iterable<Coordinates> coordinates){
+        List<CoordinatesDTO> dtos = new ArrayList<>();
+        coordinates.forEach(coord -> dtos.add(new CoordinatesDTO(coord.getId(), coord.getX(), coord.getY(),
+                new UserDTO(coord.getUser().getId(), coord.getUser().getLogin()))));
+        return dtos;
+    }
 }

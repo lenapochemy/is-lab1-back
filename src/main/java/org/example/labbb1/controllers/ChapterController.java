@@ -1,5 +1,6 @@
 package org.example.labbb1.controllers;
 
+import org.example.labbb1.dto.ChapterDTO;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Chapter;
 import org.example.labbb1.model.User;
@@ -28,14 +29,13 @@ public class ChapterController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addNewChapter(@RequestBody Chapter chapter){
+    public ResponseEntity<?> addNewChapter(@RequestBody ChapterDTO chapter){
         if(chapter.getName() == null ||chapter.getName().isEmpty()){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User user = userService.findUserByToken();
-        chapter.setUser(user);
         try {
-            chapterService.addNewChapter(chapter);
+            chapterService.addNewChapter(chapter, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -43,7 +43,7 @@ public class ChapterController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateChapter(@RequestBody Chapter chapter){
+    public ResponseEntity<?> updateChapter(@RequestBody ChapterDTO chapter){
         Chapter chapter1 = chapterService.getChapterById(chapter.getId());
         if(chapter.getName() == null ||chapter.getName().isEmpty() || chapter1 == null ){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -68,6 +68,21 @@ public class ChapterController {
                                                        @PathVariable(required = false) String sort_param,
                                                        @PathVariable(required = false) Integer page,
                                                        @PathVariable(required = false) Integer size){
+        if(size == null){
+            Iterable<ChapterDTO> chapters;
+            if(filter_param == "all"){
+                chapters = chapterService.getAllChapters();
+            } else {
+                User user = userService.findUserByToken();
+                chapters = chapterService.getAllChaptersByUser(user);
+                if(filter_value != null){
+                    List<Long> chaptersId = new ArrayList<>();
+                    chapters.forEach(chapter -> chaptersId.add(chapter.getId()));
+                    return ResponseEntity.ok(chaptersId);
+                }
+            }
+            return ResponseEntity.ok(chapters);
+        }
         Iterable<Chapter> chapters;
         switch (filter_param){
             case "name":{
@@ -78,21 +93,8 @@ public class ChapterController {
                 chapters = chapterService.getPageChapterByParentLegion(sort_param, page, size, filter_value);
                 break;
             }
-            case "user": {
-                User user = userService.findUserByToken();
-                chapters = chapterService.getAllChaptersByUser(user);
-                if(filter_value != null){
-                    List<Long> chaptersId = new ArrayList<>();
-                    chapters.forEach(chapter -> chaptersId.add(chapter.getId()));
-                    return ResponseEntity.ok(chaptersId);
-                }
-                break;
-            }
             case "all": {
-                if(size == null){
-                    chapters = chapterService.getAllChapters();
-                } else
-                    chapters = chapterService.getPageChapters(sort_param, page, size);
+                chapters = chapterService.getPageChapters(sort_param, page, size);
                 break;
             }
             default:

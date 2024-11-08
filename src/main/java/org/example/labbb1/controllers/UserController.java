@@ -1,6 +1,8 @@
 package org.example.labbb1.controllers;
 
 import jakarta.annotation.security.RolesAllowed;
+import org.example.labbb1.dto.UserDTO;
+import org.example.labbb1.dto.UserWithPasswordDTO;
 import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.User;
 import org.example.labbb1.services.UserService;
@@ -24,7 +26,7 @@ public class UserController {
 
 
     @PostMapping("/reg")
-    public ResponseEntity<?> registration(@RequestBody User user){
+    public ResponseEntity<?> registration(@RequestBody UserWithPasswordDTO user){
         try {
              userService.regNewUser(user);
              return new ResponseEntity<>(HttpStatus.OK);
@@ -76,18 +78,17 @@ public class UserController {
     @RolesAllowed("APPROVED_ADMIN")
     @GetMapping("/admin")
     public ResponseEntity<?> getWaitingAdmins(){
-        List<User> users = userService.getWaitingAdmins();
-        attributeToNull(users);
+        List<UserDTO> users = userService.getWaitingAdmins();
         return ResponseEntity.ok(users);
     }
 
 
-    private void attributeToNull(List<User> users){
-        users.forEach(user -> {
-            user.setPassword(null);
-            user.setSpaceMarines(null);
-            user.setChapters(null);
-            user.setCoordinates(null);
-        });
-    }
+//    private void attributeToNull(List<User> users){
+//        users.forEach(user -> {
+//            user.setPassword(null);
+//            user.setSpaceMarines(null);
+//            user.setChapters(null);
+//            user.setCoordinates(null);
+//        });
+//    }
 }

@@ -1,6 +1,7 @@
 package org.example.labbb1.services;
 
-
+import org.example.labbb1.dto.UserDTO;
+import org.example.labbb1.dto.UserWithPasswordDTO;
 import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.User;
 import org.example.labbb1.model.UserRole;
@@ -13,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,16 +29,18 @@ public class UserService implements UserDetailsService {
         this.passwordHasher = new PasswordHasher();
     }
 
-    public void regNewUser(User user) throws LoginAlreadyExistsException, PasswordAlreadyExistsException{
-        User user1 = userRepository.findByLogin(user.getLogin());
+    public void regNewUser(UserWithPasswordDTO userDTO) throws LoginAlreadyExistsException, PasswordAlreadyExistsException{
+        User user1 = userRepository.findByLogin(userDTO.getLogin());
         if(user1 != null){
             throw new LoginAlreadyExistsException();
         }
-        String hashedPassword = passwordHasher.hashPassword(user.getPassword());
+        String hashedPassword = passwordHasher.hashPassword(userDTO.getPassword());
         user1 = userRepository.findByPassword(hashedPassword);
         if(user1 != null){
             throw new PasswordAlreadyExistsException();
         }
+        User user = new User();
+        user.setLogin(userDTO.getLogin());
         user.setPassword(hashedPassword);
         user.setRole(UserRole.USER);
         userRepository.save(user);
@@ -88,8 +92,13 @@ public class UserService implements UserDetailsService {
         } else throw new ForbiddenException();
     }
 
-    public List<User> getWaitingAdmins(){
-        return userRepository.findAllByRole(UserRole.WAITING_ADMIN);
+    public List<UserDTO> getWaitingAdmins(){
+       List<User> users =  userRepository.findAllByRole(UserRole.WAITING_ADMIN);
+       List<UserDTO> userDTOs = new ArrayList<>();
+       users.forEach(user -> {
+           userDTOs.add(new UserDTO(user.getId(), user.getLogin()));
+       });
+       return userDTOs;
     }
 
     @Override

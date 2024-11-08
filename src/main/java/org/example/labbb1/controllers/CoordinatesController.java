@@ -1,5 +1,6 @@
 package org.example.labbb1.controllers;
 
+import org.example.labbb1.dto.CoordinatesDTO;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Coordinates;
 import org.example.labbb1.model.User;
@@ -29,15 +30,14 @@ public class CoordinatesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
+    public ResponseEntity<?> addNewCoordination(@RequestBody CoordinatesDTO coordinates){
         if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User user = userService.findUserByToken();
-
-        coordinates.setUser(user);
+//        coordinates.setUser(user);
         try {
-            coordinatesService.addNewCoordinate(coordinates);
+            coordinatesService.addNewCoordinate(coordinates, user);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (PSQLException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -51,8 +51,24 @@ public class CoordinatesController {
                                                @PathVariable(required = false) String sort_param,
                                                @PathVariable(required = false) Integer page,
                                                @PathVariable(required = false) Integer size){
-        Iterable<Coordinates> coords;
+
         try {
+            if(size == null){
+                Iterable<CoordinatesDTO> coords;
+                if(filter_param == "all"){
+                   coords = coordinatesService.getAllCoordinates();
+                } else {
+                    User user = userService.findUserByToken();
+                    coords = coordinatesService.getAllCoordinatesByUser(user);
+                    if(filter_value != null){
+                        List<Long> coordsId = new ArrayList<>();
+                        coords.forEach(coordinates -> coordsId.add(coordinates.getId()));
+                        return ResponseEntity.ok(coordsId);
+                    }
+                }
+                return ResponseEntity.ok(coords);
+            }
+            Iterable<Coordinates> coords;
             switch (filter_param) {
                 case "x": {
                     Integer x = Integer.parseInt(filter_value);
@@ -65,38 +81,25 @@ public class CoordinatesController {
                     break;
                 }
                 case "all": {
-                    if(size == null){
-                        coords = coordinatesService.getAllCoordinates();
-                    } else
-                        coords = coordinatesService.getPageCoordinates(sort_param, page, size);
-                    break;
-                }
-                case "user":{
-                    User user = userService.findUserByToken();
-                    coords = coordinatesService.getAllCoordinatesByUser(user);
-                    if(filter_value != null){
-                        List<Long> coordsId = new ArrayList<>();
-                        coords.forEach(coordinates -> coordsId.add(coordinates.getId()));
-                        return ResponseEntity.ok(coordsId);
-                    }
+                    coords = coordinatesService.getPageCoordinates(sort_param, page, size);
                     break;
                 }
                 default: {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
             }
+            attributeToNull(coords);
+            return ResponseEntity.ok(coords);
         } catch (NumberFormatException e){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        attributeToNull(coords);
-        return ResponseEntity.ok(coords);
     }
 
 
 
 
     @PostMapping("/update")
-    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
+    public ResponseEntity<?> updateCoordination(@RequestBody CoordinatesDTO coordinates){
         if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
