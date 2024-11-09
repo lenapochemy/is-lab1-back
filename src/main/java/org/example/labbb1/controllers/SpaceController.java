@@ -61,12 +61,15 @@ public class SpaceController {
         }
     }
 
-    @GetMapping(value = {"{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}", "{filter_param}/{filter_value}"})
-    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable String filter_param,
-                                                      @PathVariable(required = false) String filter_value,
-                                                      @PathVariable(required = false) String sort_param,
-                                                      @PathVariable(required = false) Integer page,
-                                                      @PathVariable(required = false) Integer size){
+//    @GetMapping(value = {"{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}", "{filter_param}/{filter_value}"})
+//    public ResponseEntity<?> getPageSpaceMarineByName(@PathVariable String filter_param,
+//                                                      @PathVariable(required = false) String filter_value,
+//                                                      @PathVariable(required = false) String sort_param,
+//                                                      @PathVariable(required = false) Integer page,
+//                                                      @PathVariable(required = false) Integer size){
+@GetMapping()
+public ResponseEntity<?> getPageSpaceMarineByName(String filter_param, String filter_value, String sort_param,
+                Integer page, Integer size){
         Iterable<SpaceMarine> spaceMarines;
         switch (filter_param){
             case "name":{

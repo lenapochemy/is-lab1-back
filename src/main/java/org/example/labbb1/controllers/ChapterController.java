@@ -62,12 +62,13 @@ public class ChapterController {
         }
     }
 
-    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}", "/{filter_param}/{filter_value}"})
-    public ResponseEntity<?> getChaptersByparentlegion(@PathVariable String filter_param,
-                                                       @PathVariable(required = false) String filter_value,
-                                                       @PathVariable(required = false) String sort_param,
-                                                       @PathVariable(required = false) Integer page,
-                                                       @PathVariable(required = false) Integer size){
+    @GetMapping
+//    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "{filter_param}", "/{filter_param}/{filter_value}"})
+    public ResponseEntity<?> getChaptersByParentlegion( String filter_param,
+                                                        String filter_value,
+                                                        String sort_param,
+                                                        Integer page,
+                                                        Integer size){
         Iterable<Chapter> chapters;
         switch (filter_param){
             case "name":{
