@@ -1,5 +1,6 @@
 package org.example.labbb1.services;
 
+import org.example.labbb1.exceptions.ChapterException;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.ChapterRepository;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -25,7 +29,7 @@ public class ChapterService {
         this.editChapterRepository = editChapterRepository;
     }
 
-
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Chapter getChapterById(Long id){
         var chapt =  chapterRepository.findById(id);
         Chapter chapter = null;
@@ -35,14 +39,19 @@ public class ChapterService {
         return chapter;
     }
 
-    public void addNewChapter(Chapter chapter) throws PSQLException {
-        chapterRepository.save(chapter);
-        EditChapter editChapter = new EditChapter();
-        editChapter.setChapter(chapter);
-        editChapter.setType(EditType.CREATE);
-        editChapter.setUser(chapter.getUser());
-        editChapter.setDate(LocalDateTime.now());
-        editChapterRepository.save(editChapter);
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+    public void addNewChapter(Chapter chapter) throws ChapterException {
+        if(chapter.getParentLegion() != null && !chapter.getParentLegion().startsWith("l")){
+            throw new ChapterException();
+        } else {
+            chapterRepository.save(chapter);
+            EditChapter editChapter = new EditChapter();
+            editChapter.setChapter(chapter);
+            editChapter.setType(EditType.CREATE);
+            editChapter.setUser(chapter.getUser());
+            editChapter.setDate(LocalDateTime.now());
+            editChapterRepository.save(editChapter);
+        }
     }
 
     public boolean updateChapter(Chapter chapter, User user) throws PSQLException, ForbiddenException{
@@ -67,6 +76,7 @@ public class ChapterService {
         } else return false;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Chapter> getAllChaptersByUser(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return getAllChapters();
@@ -74,21 +84,26 @@ public class ChapterService {
         return chapterRepository.findAllByUser(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Chapter> getAllChapters(){
         return chapterRepository.findAll();
     }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Chapter> getPageChapters(String sortParam, int page, int size){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return chapterRepository.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Chapter> getPageChapterByName(String sortParam, int page, int size, String name){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return chapterRepository.findAllByName(pageable, name);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Chapter> getPageChapterByParentLegion(String sortParam, int page, int size, String parentLegion){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);

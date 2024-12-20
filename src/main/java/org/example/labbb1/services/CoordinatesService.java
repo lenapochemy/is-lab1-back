@@ -1,5 +1,6 @@
 package org.example.labbb1.services;
 
+import org.example.labbb1.exceptions.CoordinatesException;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.CoordinatesRepository;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +33,11 @@ public class CoordinatesService {
         return coordinatesRepository.findById(id);
     }
 
-    public void addNewCoordinate(Coordinates coordinates) throws PSQLException {
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+    public void addNewCoordinate(Coordinates coordinates) throws CoordinatesException{
+        if(coordinates.getX() % 5 != 0) {
+            throw new CoordinatesException();
+        }
         coordinatesRepository.save(coordinates);
         EditCoordinates editCoordinates = new EditCoordinates();
         editCoordinates.setCoordinates(coordinates);

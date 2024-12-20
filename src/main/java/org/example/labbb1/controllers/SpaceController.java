@@ -2,6 +2,7 @@ package org.example.labbb1.controllers;
 
 
 import org.example.labbb1.exceptions.ForbiddenException;
+import org.example.labbb1.exceptions.IncorrectValueException;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.ChapterService;
 import org.example.labbb1.services.CoordinatesService;
@@ -56,8 +57,8 @@ public class SpaceController {
             spaceMarine.setCreationDate(LocalDateTime.now());
             spaceService.addNewSpaceMarine(spaceMarine);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (PSQLException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (IncorrectValueException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Too many marines for one chapter, choose another chapter");
         }
     }
 
@@ -166,6 +167,7 @@ public ResponseEntity<?> getPageSpaceMarineByName(String filter_param, String fi
                 spaceMarine.getUser().setSpaceMarines(null);
                 spaceMarine.getUser().setId(null);
                 spaceMarine.getUser().setPassword(null);
+                spaceMarine.getUser().setImports(null);
                 spaceMarine.setEditSpaceMarines(null);
                 spaceMarine.getCoordinates().setEditCoordinates(null);
                 spaceMarine.getChapter().setEditChapters(null);

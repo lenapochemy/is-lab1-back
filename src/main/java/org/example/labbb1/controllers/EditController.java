@@ -35,6 +35,7 @@ public class EditController {
             editChapter.getUser().setChapters(null);
             editChapter.getUser().setPassword(null);
             editChapter.getUser().setId(null);
+            editChapter.getUser().setImports(null);
             editChapter.getChapter().setUser(null);
             editChapter.getChapter().setSpaceMarines(null);
             editChapter.getChapter().setEditChapters(null);
@@ -52,6 +53,7 @@ public class EditController {
             editCoordinates.getUser().setChapters(null);
             editCoordinates.getUser().setPassword(null);
             editCoordinates.getUser().setId(null);
+            editCoordinates.getUser().setImports(null);
             editCoordinates.getCoordinates().setUser(null);
             editCoordinates.getCoordinates().setSpaceMarines(null);
             editCoordinates.getCoordinates().setEditCoordinates(null);
@@ -70,6 +72,7 @@ public class EditController {
             editSpaceMarine.getUser().setChapters(null);
             editSpaceMarine.getUser().setPassword(null);
             editSpaceMarine.getUser().setId(null);
+            editSpaceMarine.getUser().setImports(null);
             editSpaceMarine.getSpaceMarine().setUser(null);
             editSpaceMarine.getSpaceMarine().getCoordinates().setUser(null);
             editSpaceMarine.getSpaceMarine().getCoordinates().setSpaceMarines(null);

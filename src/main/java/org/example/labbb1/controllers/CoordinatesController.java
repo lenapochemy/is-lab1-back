@@ -1,5 +1,6 @@
 package org.example.labbb1.controllers;
 
+import org.example.labbb1.exceptions.CoordinatesException;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.model.Coordinates;
 import org.example.labbb1.model.User;
@@ -29,8 +30,8 @@ public class CoordinatesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates){
-        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
+    public ResponseEntity<?> addNewCoordination(@RequestBody Coordinates coordinates) {
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         User user = userService.findUserByToken();
@@ -39,21 +40,21 @@ public class CoordinatesController {
         try {
             coordinatesService.addNewCoordinate(coordinates);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (PSQLException e){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        } catch (CoordinatesException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Coordinates X value should be multiple 5");
         }
     }
 
 
-//    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "/{filter_param}", "/{filter_param}/{filter_value}"})
+    //    @GetMapping(value =  {"/{filter_param}/{filter_value}/{sort_param}/{page}/{size}", "/{filter_param}", "/{filter_param}/{filter_value}"})
 //    public ResponseEntity<?> getCoordinatesByY(@PathVariable String filter_param,
 //                                               @PathVariable(required = false) String filter_value,
 //                                               @PathVariable(required = false) String sort_param,
 //                                               @PathVariable(required = false) Integer page,
 //                                               @PathVariable(required = false) Integer size){
-@GetMapping
+    @GetMapping
     public ResponseEntity<?> getCoordinatesByY(String filter_param, String filter_value, String sort_param,
-                                               Integer page, Integer size){
+                                               Integer page, Integer size) {
         Iterable<Coordinates> coords;
         try {
             switch (filter_param) {
@@ -68,16 +69,16 @@ public class CoordinatesController {
                     break;
                 }
                 case "all": {
-                    if(size == null){
+                    if (size == null) {
                         coords = coordinatesService.getAllCoordinates();
                     } else
                         coords = coordinatesService.getPageCoordinates(sort_param, page, size);
                     break;
                 }
-                case "user":{
+                case "user": {
                     User user = userService.findUserByToken();
                     coords = coordinatesService.getAllCoordinatesByUser(user);
-                    if(filter_value != null){
+                    if (filter_value != null) {
                         List<Long> coordsId = new ArrayList<>();
                         coords.forEach(coordinates -> coordsId.add(coordinates.getId()));
                         return ResponseEntity.ok(coordsId);
@@ -88,7 +89,7 @@ public class CoordinatesController {
                     return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
                 }
             }
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         attributeToNull(coords);
@@ -96,38 +97,36 @@ public class CoordinatesController {
     }
 
 
-
-
     @PostMapping("/update")
-    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates){
-        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147){
+    public ResponseEntity<?> updateCoordination(@RequestBody Coordinates coordinates) {
+        if (coordinates.getX() == null || coordinates.getY() == null || coordinates.getX() <= -147) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         try {
             User user = userService.findUserByToken();
-            if(coordinatesService.updateCoordinate(coordinates, user)) {
+            if (coordinatesService.updateCoordinate(coordinates, user)) {
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        } catch (PSQLException e){
+        } catch (PSQLException e) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        } catch (ForbiddenException e){
+        } catch (ForbiddenException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCoord(@PathVariable Long id){
+    public ResponseEntity<?> deleteCoord(@PathVariable Long id) {
         User user = userService.findUserByToken();
-        try{
-            if(coordinatesService.deleteCoord(id, user)) {
+        try {
+            if (coordinatesService.deleteCoord(id, user)) {
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
-        } catch (ForbiddenException e){
+        } catch (ForbiddenException e) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
@@ -141,6 +140,7 @@ public class CoordinatesController {
                 coordinates.getUser().setId(null);
                 coordinates.getUser().setChapters(null);
                 coordinates.getUser().setSpaceMarines(null);
+                coordinates.getUser().setImports(null);
                 coordinates.setEditCoordinates(null);
             });
         }

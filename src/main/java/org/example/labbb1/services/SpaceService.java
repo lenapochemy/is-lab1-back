@@ -1,6 +1,6 @@
 package org.example.labbb1.services;
 
-import org.example.labbb1.exceptions.ForbiddenException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.*;
 import org.example.labbb1.repositories.EditSpaceMarineRepository;
 import org.example.labbb1.repositories.SpaceRepository;
@@ -10,24 +10,44 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class SpaceService {
 
     private final SpaceRepository spaceRepository;
     private final EditSpaceMarineRepository editSpaceMarineRepository;
-
+    private final UserService userService;
+    private final CoordinatesService coordinatesService;
+    private final ChapterService chapterService;
 
     @Autowired
-    public SpaceService(SpaceRepository spaceRepository, EditSpaceMarineRepository editSpaceMarineRepository){
+    public SpaceService(SpaceRepository spaceRepository, EditSpaceMarineRepository editSpaceMarineRepository,
+                        UserService userService, ChapterService chapterService, CoordinatesService coordinatesService) {
         this.spaceRepository = spaceRepository;
         this.editSpaceMarineRepository = editSpaceMarineRepository;
+        this.userService = userService;
+        this.coordinatesService = coordinatesService;
+        this.chapterService = chapterService;
     }
 
 
-    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws PSQLException{
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws IncorrectValueException {
+        if (spaceMarine.getChapter().getId() != null) {
+            Chapter chapter = chapterService.getChapterById(spaceMarine.getChapter().getId());
+
+            if (chapter != null && chapter.getSpaceMarines().size() >= 3) {
+                System.out.println("-------------");
+                throw new IncorrectValueException();
+            }
+
+        }
         spaceRepository.save(spaceMarine);
         EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
         editSpaceMarine.setSpaceMarine(spaceMarine);
@@ -37,12 +57,51 @@ public class SpaceService {
         editSpaceMarineRepository.save(editSpaceMarine);
     }
 
-    public boolean updateSpaceMarine(SpaceMarine spaceMarine, User user) throws PSQLException, ForbiddenException{
+    @Transactional(rollbackFor = {IncorrectValueException.class, ChapterException.class, CoordinatesException.class}, isolation = Isolation.SERIALIZABLE)
+    public void addListOfNewSpaceMarines(List<SpaceMarine> spaceMarineList) throws IncorrectValueException, CoordinatesException, ChapterException {
+//        try {
+        for (SpaceMarine spaceMarine : spaceMarineList) {
+            if (spaceMarine.getName() == null || spaceMarine.getName().isEmpty() || spaceMarine.getCoordinates() == null ||
+                    spaceMarine.getCoordinates().getX() == null || spaceMarine.getCoordinates().getX() <= -147 ||
+                    spaceMarine.getCoordinates().getY() == null || spaceMarine.getChapter() == null ||
+                    spaceMarine.getChapter().getName() == null || spaceMarine.getChapter().getName().isEmpty() ||
+                    spaceMarine.getHealth() <= 0 || spaceMarine.getCategory() == null) {
+//                    return "Incorrect value";
+                throw new IncorrectValueException();
+            }
+            User user = userService.findUserByToken();
+
+                Coordinates coordinates = spaceMarine.getCoordinates();
+                coordinates.setUser(user);
+                coordinatesService.addNewCoordinate(coordinates);
+
+                Chapter chapter = spaceMarine.getChapter();
+                chapter.setUser(user);
+                chapterService.addNewChapter(chapter);
+
+            spaceMarine.setCreationDate(LocalDateTime.now());
+//            spaceMarine.getChapter().setUser(user);
+//            spaceMarine.getCoordinates().setUser(user);
+            spaceMarine.setUser(user);
+            addNewSpaceMarine(spaceMarine);
+        }
+//        } catch (IncorrectValueException e) {
+//            return "Too many marines in one chapter, choose another chapter";
+//        } catch (ChapterException e) {
+//            return "Parent legion value should be start from letter \"l\"";
+//        } catch (CoordinatesException e) {
+//            return "Coordinate X value should multiply 5";
+//        }
+
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public boolean updateSpaceMarine(SpaceMarine spaceMarine, User user) throws PSQLException, ForbiddenException {
         var marine = spaceRepository.findById(spaceMarine.getId());
-        if(marine.isPresent()){
+        if (marine.isPresent()) {
             SpaceMarine spaceMarine1 = marine.get();
-            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
-                    spaceMarine1.getUser().getId().equals(user.getId())){
+            if (user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    spaceMarine1.getUser().getId().equals(user.getId())) {
 
                 spaceMarine1.setName(spaceMarine.getName());
                 spaceMarine1.setCoordinates(spaceMarine.getCoordinates());
@@ -65,69 +124,75 @@ public class SpaceService {
     }
 
 
-    public SpaceMarine getSpaceMarine(Long id){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public SpaceMarine getSpaceMarine(Long id) {
         var marine = spaceRepository.findById(id);
         SpaceMarine spaceMarine = null;
-        if(marine.isPresent()){
+        if (marine.isPresent()) {
             spaceMarine = marine.get();
         }
         return spaceMarine;
     }
 
-
-    public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page, int size){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getPageSpaceMarine(String sortParam, int page, int size) {
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAll(pageable);
     }
 
-    public Iterable<SpaceMarine> getAllSpaceMarineByUser(User user){
-        if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getAllSpaceMarineByUser(User user) {
+        if (user.getRole().equals(UserRole.APPROVED_ADMIN)) {
             return getAllSpaceMarine();
         }
         return spaceRepository.findAllByUser(user);
     }
 
-    public Iterable<SpaceMarine> getAllSpaceMarine(){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getAllSpaceMarine() {
         return spaceRepository.findAll();
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, int size, String name){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getPageSpaceMarineByName(String sortParam, int page, int size, String name) {
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByName(pageable, name);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByCoordinates(String sortParam, int page, int size, Coordinates coordinates){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getPageSpaceMarineByCoordinates(String sortParam, int page, int size, Coordinates coordinates) {
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByCoordinates(pageable, coordinates);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, int size, Chapter chapter){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getPageSpaceMarineByChapter(String sortParam, int page, int size, Chapter chapter) {
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByChapter(pageable, chapter);
     }
 
-    public Iterable<SpaceMarine> getPageSpaceMarineByHealth(String sortParam, int page, int size, Long health){
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Iterable<SpaceMarine> getPageSpaceMarineByHealth(String sortParam, int page, int size, Long health) {
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return spaceRepository.findAllByHealth(pageable, health);
     }
 
-    public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException{
+    public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException {
         var marine = spaceRepository.findById(id);
-        if(marine.isPresent()){
+        if (marine.isPresent()) {
             SpaceMarine spaceMarine1 = marine.get();
-            if(user.getRole().equals(UserRole.APPROVED_ADMIN) ||
-                    spaceMarine1.getUser().getId().equals(user.getId())){
+            if (user.getRole().equals(UserRole.APPROVED_ADMIN) ||
+                    spaceMarine1.getUser().getId().equals(user.getId())) {
                 spaceRepository.deleteById(id);
                 return true;
             } else throw new ForbiddenException();
         } else return false;
     }
-
 
 
 }

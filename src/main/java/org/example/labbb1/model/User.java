@@ -43,6 +43,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<SpaceMarine> spaceMarines;
 
+    @OneToMany(mappedBy = "user")
+    private List<ImportHistory> imports;
 
     @Override
     @JsonIgnore

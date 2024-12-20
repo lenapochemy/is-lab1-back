@@ -88,6 +88,7 @@ public class UserController {
             user.setSpaceMarines(null);
             user.setChapters(null);
             user.setCoordinates(null);
+            user.setImports(null);
         });
     }
 }
