@@ -35,6 +35,8 @@ public class ChapterService {
         Chapter chapter = null;
         if(chapt.isPresent()){
             chapter = chapt.get();
+        } else {
+            System.out.println("don't have chapter in db");
         }
         return chapter;
     }
@@ -54,6 +56,7 @@ public class ChapterService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean updateChapter(Chapter chapter, User user) throws PSQLException, ForbiddenException{
         var chap = chapterRepository.findById(chapter.getId());
         if(chap.isPresent()) {

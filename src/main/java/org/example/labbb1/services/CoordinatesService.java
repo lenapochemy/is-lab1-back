@@ -29,6 +29,7 @@ public class CoordinatesService {
         this.editCoordinatesRepository = editCoordinatesRepository;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Coordinates getCoordById(long id){
         return coordinatesRepository.findById(id);
     }
@@ -47,6 +48,7 @@ public class CoordinatesService {
         editCoordinatesRepository.save(editCoordinates);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public boolean updateCoordinate(Coordinates coordinates, User user) throws PSQLException, ForbiddenException{
         var coord = coordinatesRepository.findById(coordinates.getId());
         if(coord.isPresent()) {
@@ -67,7 +69,7 @@ public class CoordinatesService {
         } else return false;
     }
 
-
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Coordinates> getAllCoordinatesByUser(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return getAllCoordinates();
@@ -75,22 +77,26 @@ public class CoordinatesService {
         return coordinatesRepository.findAllByUser(user);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Coordinates> getAllCoordinates(){
         return coordinatesRepository.findAll();
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Coordinates> getPageCoordinates(String sortParam, int page, int size){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return coordinatesRepository.findAll(pageable);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Coordinates> getPageCoordinatesByX(String sortParam, int page, int size, Integer x){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);
         return coordinatesRepository.findAllByX(pageable, x);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public Iterable<Coordinates> getPageCoordinatesByY(String sortParam, int page, int size, Float y){
         Sort sort = Sort.by(Sort.Direction.ASC, sortParam);
         Pageable pageable = PageRequest.of(page, size, sort);

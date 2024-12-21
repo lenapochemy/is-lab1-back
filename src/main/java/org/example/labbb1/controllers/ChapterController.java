@@ -71,6 +71,9 @@ public class ChapterController {
                                                        String sort_param,
                                                        Integer page,
                                                        Integer size) {
+        if (filter_param == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Iterable<Chapter> chapters;
         switch (filter_param) {
             case "name": {
@@ -123,8 +126,9 @@ public class ChapterController {
         if (chapters != null) {
             chapters.forEach(chapter -> {
                 chapter.setSpaceMarines(null);
+                System.out.println(chapter.getUser().toString());
                 chapter.getUser().setPassword(null);
-                chapter.getUser().setId(null);
+//                chapter.getUser().setId(null);
                 chapter.getUser().setCoordinates(null);
                 chapter.getUser().setChapters(null);
                 chapter.getUser().setImports(null);

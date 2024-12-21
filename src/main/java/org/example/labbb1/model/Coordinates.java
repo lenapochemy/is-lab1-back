@@ -26,7 +26,7 @@ public class Coordinates {
     @Column(nullable = false)
     private Float y;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     private User user;
 
     @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE, orphanRemoval = true)

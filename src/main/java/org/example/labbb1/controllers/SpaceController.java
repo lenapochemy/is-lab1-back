@@ -1,6 +1,7 @@
 package org.example.labbb1.controllers;
 
 
+import org.example.labbb1.exceptions.ChapterException;
 import org.example.labbb1.exceptions.ForbiddenException;
 import org.example.labbb1.exceptions.IncorrectValueException;
 import org.example.labbb1.model.*;
@@ -57,7 +58,7 @@ public class SpaceController {
             spaceMarine.setCreationDate(LocalDateTime.now());
             spaceService.addNewSpaceMarine(spaceMarine);
             return new ResponseEntity<>(HttpStatus.OK);
-        } catch (IncorrectValueException e){
+        } catch (ChapterException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Too many marines for one chapter, choose another chapter");
         }
     }

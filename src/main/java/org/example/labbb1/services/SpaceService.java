@@ -37,14 +37,15 @@ public class SpaceService {
     }
 
 
-    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws IncorrectValueException {
+    @Transactional(rollbackFor = {ChapterException.class}, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
+    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws ChapterException {
         if (spaceMarine.getChapter().getId() != null) {
             Chapter chapter = chapterService.getChapterById(spaceMarine.getChapter().getId());
-
-            if (chapter != null && chapter.getSpaceMarines().size() >= 3) {
+            System.out.println(chapter.toString());
+           spaceRepository.findAllByChapter(chapter).forEach((x)-> System.out.println(x.toString()));
+            if (chapter.getSpaceMarines().size() >= 3) {
                 System.out.println("-------------");
-                throw new IncorrectValueException();
+                throw new ChapterException();
             }
 
         }

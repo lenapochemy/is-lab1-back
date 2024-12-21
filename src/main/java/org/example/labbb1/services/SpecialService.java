@@ -9,6 +9,8 @@ import org.example.labbb1.repositories.ChapterRepository;
 import org.example.labbb1.repositories.SpaceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,7 @@ public class SpecialService {
         this.chapterRepository = chapterRepository;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public SpaceMarine getSpaceMarineWithMinChapter(){
         Long minChapterId = Long.MAX_VALUE;
         SpaceMarine spaceMarine = null;
@@ -39,6 +42,7 @@ public class SpecialService {
         return spaceMarine;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<SpaceMarine> getSpaceMarinesWithNameStart(String string){
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
         List<SpaceMarine> spaceMarines = new ArrayList<>();
@@ -50,6 +54,7 @@ public class SpecialService {
         return spaceMarines;
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<SpaceMarine> getSpaceMarinesWithGreaterMeleeWeapon(MeleeWeapon meleeWeapon){
         Iterable<SpaceMarine> spaceMarineList = spaceRepository.findAll();
         List<SpaceMarine> spaceMarines = new ArrayList<>();

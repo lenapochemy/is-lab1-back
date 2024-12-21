@@ -135,9 +135,10 @@ public class CoordinatesController {
         if (coords != null) {
             coords.forEach(coordinates -> {
                 coordinates.setSpaceMarines(null);
+                System.out.println(coordinates.getUser().toString());
                 coordinates.getUser().setPassword(null);
                 coordinates.getUser().setCoordinates(null);
-                coordinates.getUser().setId(null);
+//                coordinates.getUser().setId(null);
                 coordinates.getUser().setChapters(null);
                 coordinates.getUser().setSpaceMarines(null);
                 coordinates.getUser().setImports(null);

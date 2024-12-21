@@ -27,12 +27,18 @@ public class Chapter {
     private String parentLegion;
 
     @CascadeOnDelete
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<SpaceMarine> spaceMarines;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     private User user;
 
     @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<EditChapter> editChapters;
+
+
+    @Override
+    public String toString(){
+        return "chapter: id=" + this.id + " name=" + this.name + " marines count=" + this.spaceMarines.size();
+    }
 }

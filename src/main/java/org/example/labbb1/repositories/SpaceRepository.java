@@ -22,6 +22,8 @@ public interface SpaceRepository extends CrudRepository<SpaceMarine, Long>, Pagi
     Page<SpaceMarine> findAllByCoordinates(Pageable pageable, Coordinates coordinates);
     Page<SpaceMarine> findAllByCreationDate(Pageable pageable, LocalDateTime creationDate);
     Page<SpaceMarine> findAllByChapter(Pageable pageable, Chapter chapter);
+
+    List<SpaceMarine> findAllByChapter(Chapter chapter);
     Page<SpaceMarine> findAllByHealth(Pageable pageable, Long health);
     Page<SpaceMarine> findAllByCategory(Pageable pageable, AstartesCategory category);
     Page<SpaceMarine> findAllByWeaponType(Pageable pageable, Weapon weaponType);

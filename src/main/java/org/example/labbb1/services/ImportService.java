@@ -6,6 +6,8 @@ import org.example.labbb1.model.UserRole;
 import org.example.labbb1.repositories.ImportRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,6 +25,7 @@ public class ImportService {
         importRepository.save(importHistory);
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<ImportHistory> getImportHistory(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return attributesToNull(importRepository.findAll());

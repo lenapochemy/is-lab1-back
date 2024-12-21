@@ -56,4 +56,10 @@ public class User implements UserDetails {
     public String getUsername(){
         return getLogin();
     }
+
+
+    @Override
+    public String toString(){
+        return "user: id=" + this.id + " login=" + this.login + " password=" + this.password + " role=" + this.role;
+    }
 }
