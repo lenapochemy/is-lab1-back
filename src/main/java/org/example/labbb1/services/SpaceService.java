@@ -37,18 +37,27 @@ public class SpaceService {
     }
 
 
-    @Transactional(rollbackFor = {ChapterException.class}, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws ChapterException {
-        if (spaceMarine.getChapter().getId() != null) {
-            Chapter chapter = chapterService.getChapterById(spaceMarine.getChapter().getId());
-            System.out.println(chapter.toString());
-           spaceRepository.findAllByChapter(chapter).forEach((x)-> System.out.println(x.toString()));
-            if (chapter.getSpaceMarines().size() >= 3) {
-                System.out.println("-------------");
-                throw new ChapterException();
-            }
+    @Transactional(rollbackFor = {ChapterException.class, TooManyMarinesInOneChapterException.class, MarineException.class},
+            propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
+    public void addNewSpaceMarine(SpaceMarine spaceMarine) throws ChapterException, TooManyMarinesInOneChapterException, MarineException {
 
+        SpaceMarine marine = spaceRepository.findByName(spaceMarine.getName());
+        if (marine != null){
+            throw new MarineException();
         }
+
+        Chapter chapter = chapterService.getChapterById(spaceMarine.getChapter().getId());
+        if (chapter == null) {
+            throw new ChapterException();
+        }
+        System.out.println(chapter.toString());
+        System.out.println(chapter.getSpaceMarines().size());
+        spaceRepository.findAllByChapter(chapter).forEach((x) -> System.out.println(x.toString()));
+        if (chapter.getSpaceMarines().size() >= 3) {
+            System.out.println("-------------");
+            throw new TooManyMarinesInOneChapterException();
+        }
+
         spaceRepository.save(spaceMarine);
         EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
         editSpaceMarine.setSpaceMarine(spaceMarine);
@@ -58,9 +67,10 @@ public class SpaceService {
         editSpaceMarineRepository.save(editSpaceMarine);
     }
 
-    @Transactional(rollbackFor = {IncorrectValueException.class, ChapterException.class, CoordinatesException.class}, isolation = Isolation.SERIALIZABLE)
-    public void addListOfNewSpaceMarines(List<SpaceMarine> spaceMarineList) throws IncorrectValueException, CoordinatesException, ChapterException {
-//        try {
+    @Transactional(rollbackFor = {IncorrectValueException.class, ChapterException.class, CoordinatesException.class,
+            TooManyMarinesInOneChapterException.class, MarineException.class}, isolation = Isolation.SERIALIZABLE)
+    public void addListOfNewSpaceMarines(List<SpaceMarine> spaceMarineList) throws IncorrectValueException,
+            CoordinatesException, ChapterException, TooManyMarinesInOneChapterException, MarineException {
         for (SpaceMarine spaceMarine : spaceMarineList) {
             if (spaceMarine.getName() == null || spaceMarine.getName().isEmpty() || spaceMarine.getCoordinates() == null ||
                     spaceMarine.getCoordinates().getX() == null || spaceMarine.getCoordinates().getX() <= -147 ||
@@ -72,27 +82,18 @@ public class SpaceService {
             }
             User user = userService.findUserByToken();
 
-                Coordinates coordinates = spaceMarine.getCoordinates();
-                coordinates.setUser(user);
-                coordinatesService.addNewCoordinate(coordinates);
+            Coordinates coordinates = spaceMarine.getCoordinates();
+            coordinates.setUser(user);
+            coordinatesService.addNewCoordinate(coordinates);
 
-                Chapter chapter = spaceMarine.getChapter();
-                chapter.setUser(user);
-                chapterService.addNewChapter(chapter);
+            Chapter chapter = spaceMarine.getChapter();
+            chapter.setUser(user);
+            chapterService.addNewChapter(chapter);
 
             spaceMarine.setCreationDate(LocalDateTime.now());
-//            spaceMarine.getChapter().setUser(user);
-//            spaceMarine.getCoordinates().setUser(user);
             spaceMarine.setUser(user);
             addNewSpaceMarine(spaceMarine);
         }
-//        } catch (IncorrectValueException e) {
-//            return "Too many marines in one chapter, choose another chapter";
-//        } catch (ChapterException e) {
-//            return "Parent legion value should be start from letter \"l\"";
-//        } catch (CoordinatesException e) {
-//            return "Coordinate X value should multiply 5";
-//        }
 
     }
 
@@ -183,6 +184,7 @@ public class SpaceService {
         return spaceRepository.findAllByHealth(pageable, health);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean deleteSpaceMarine(Long id, User user) throws ForbiddenException {
         var marine = spaceRepository.findById(id);
         if (marine.isPresent()) {

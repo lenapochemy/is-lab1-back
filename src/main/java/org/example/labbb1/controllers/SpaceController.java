@@ -1,9 +1,7 @@
 package org.example.labbb1.controllers;
 
 
-import org.example.labbb1.exceptions.ChapterException;
-import org.example.labbb1.exceptions.ForbiddenException;
-import org.example.labbb1.exceptions.IncorrectValueException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.*;
 import org.example.labbb1.services.ChapterService;
 import org.example.labbb1.services.CoordinatesService;
@@ -58,8 +56,15 @@ public class SpaceController {
             spaceMarine.setCreationDate(LocalDateTime.now());
             spaceService.addNewSpaceMarine(spaceMarine);
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (RuntimeException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (ChapterException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This chapter doesn't exist");
+        } catch (TooManyMarinesInOneChapterException e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Too many marines for one chapter, choose another chapter");
+        } catch (MarineException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Marine name should be unique");
+
         }
     }
 
@@ -153,6 +158,8 @@ public ResponseEntity<?> getPageSpaceMarineByName(String filter_param, String fi
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         } catch (ForbiddenException e){
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        } catch (RuntimeException e){
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
     }
 

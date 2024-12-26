@@ -1,10 +1,7 @@
 package org.example.labbb1.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 
 import java.util.List;
@@ -15,10 +12,12 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
+@Cacheable(value = false)
 public class Chapter {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -33,12 +32,12 @@ public class Chapter {
     @ManyToOne (fetch = FetchType.EAGER)
     private User user;
 
-    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "chapter", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<EditChapter> editChapters;
 
 
-    @Override
-    public String toString(){
-        return "chapter: id=" + this.id + " name=" + this.name + " marines count=" + this.spaceMarines.size();
-    }
+//    @Override
+//    public String toString(){
+//        return "chapter: id=" + this.id + " name=" + this.name + " marines count=" + this.spaceMarines.size();
+//    }
 }

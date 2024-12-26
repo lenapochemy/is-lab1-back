@@ -1,10 +1,7 @@
 package org.example.labbb1.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.example.labbb1.exceptions.ChapterException;
-import org.example.labbb1.exceptions.CoordinatesException;
-import org.example.labbb1.exceptions.IncorrectValueException;
-import org.example.labbb1.exceptions.TooManyMarinesInOneChapterException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.ImportHistory;
 import org.example.labbb1.model.User;
 import org.example.labbb1.services.FileStorageService;
@@ -64,6 +61,13 @@ public class FileController {
         } catch (CoordinatesException e) {
             importHistory.setStatus(false);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect value in file: Coordinates X value should be multiple 5");
+        } catch (TooManyMarinesInOneChapterException e) {
+            importHistory.setStatus(false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect value in file: Too many marines for one chapter,");
+        } catch (MarineException e) {
+            importHistory.setStatus(false);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Marine name should be unique");
+
         } finally {
             importHistory.setDateTime(LocalDateTime.now());
             importService.addNewImport(importHistory);

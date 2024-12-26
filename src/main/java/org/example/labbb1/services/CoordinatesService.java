@@ -103,6 +103,7 @@ public class CoordinatesService {
         return coordinatesRepository.findAllByY(pageable, y);
     }
 
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean deleteCoord(Long id, User user) throws ForbiddenException{
         var coord = coordinatesRepository.findById(id);
         if(coord.isPresent()) {

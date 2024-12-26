@@ -3,10 +3,7 @@ package org.example.labbb1.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.labbb1.exceptions.ChapterException;
-import org.example.labbb1.exceptions.CoordinatesException;
-import org.example.labbb1.exceptions.IncorrectValueException;
-import org.example.labbb1.exceptions.TooManyMarinesInOneChapterException;
+import org.example.labbb1.exceptions.*;
 import org.example.labbb1.model.ImportHistory;
 import org.example.labbb1.model.SpaceMarine;
 import org.example.labbb1.model.User;
@@ -31,7 +28,8 @@ public class FileStorageService {
 
 
     public int parseFile(MultipartFile file, User user) throws JsonProcessingException, IOException,
-            IncorrectValueException, ChapterException, CoordinatesException{
+            IncorrectValueException, ChapterException, CoordinatesException, TooManyMarinesInOneChapterException,
+            MarineException {
         String content = new String(file.getBytes());
         ObjectMapper objectMapper = new ObjectMapper();
         List<SpaceMarine> spaceMarines = objectMapper.readValue(content, new TypeReference<>() {

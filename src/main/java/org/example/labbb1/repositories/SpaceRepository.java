@@ -29,7 +29,7 @@ public interface SpaceRepository extends CrudRepository<SpaceMarine, Long>, Pagi
     Page<SpaceMarine> findAllByWeaponType(Pageable pageable, Weapon weaponType);
     Page<SpaceMarine> findAllByMeleeWeapon(Pageable pageable, MeleeWeapon meleeWeapon);
 
-
+    SpaceMarine findByName(String name);
 
 
 }

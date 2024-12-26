@@ -113,7 +113,7 @@ public class ChapterService {
         return chapterRepository.findAllByParentLegion(pageable, parentLegion);
     }
 
-
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
     public boolean deleteChapter(Long id, User user) throws ForbiddenException{
         var chap = chapterRepository.findById(id);
         if(chap.isPresent()) {

@@ -19,10 +19,11 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
+@Cacheable(value = false)
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(unique = true, nullable = false)
