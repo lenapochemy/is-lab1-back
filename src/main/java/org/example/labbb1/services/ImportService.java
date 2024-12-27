@@ -21,17 +21,25 @@ public class ImportService {
         this.importRepository = importRepository;
     }
 
-    public void addNewImport(ImportHistory importHistory){
-        importRepository.save(importHistory);
+    public ImportHistory addNewImport(ImportHistory importHistory){
+        return importRepository.save(importHistory);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+//    @Transactional(isolation = Isolation.READ_COMMITTED)
     public List<ImportHistory> getImportHistory(User user){
         if(user.getRole().equals(UserRole.APPROVED_ADMIN)){
             return attributesToNull(importRepository.findAll());
         } else {
             return attributesToNull(importRepository.findAllByUser(user));
         }
+    }
+
+    public ImportHistory findById(Long id){
+        var his = importRepository.findById(id);
+        if(his.isPresent()){
+            return his.get();
+        }
+        else return null;
     }
 
     private List<ImportHistory> attributesToNull(List<ImportHistory> list){

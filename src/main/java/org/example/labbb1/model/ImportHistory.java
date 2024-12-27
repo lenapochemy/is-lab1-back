@@ -29,6 +29,7 @@ public class ImportHistory {
 
     private Integer count;
 
+
     @Column(nullable = false)
     private LocalDateTime dateTime;
 

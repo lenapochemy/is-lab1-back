@@ -50,14 +50,15 @@ public class SpaceService {
         if (chapter == null) {
             throw new ChapterException();
         }
-        System.out.println(chapter.toString());
-        System.out.println(chapter.getSpaceMarines().size());
-        spaceRepository.findAllByChapter(chapter).forEach((x) -> System.out.println(x.toString()));
-        if (chapter.getSpaceMarines().size() >= 3) {
-            System.out.println("-------------");
-            throw new TooManyMarinesInOneChapterException();
+//        System.out.println(chapter.toString());
+//        System.out.println(chapter.getSpaceMarines().size());
+//        spaceRepository.findAllByChapter(chapter).forEach((x) -> System.out.println(x.toString()));
+        if(chapter.getSpaceMarines() != null) {
+            if (chapter.getSpaceMarines().size() >= 3) {
+//            System.out.println("-------------");
+                throw new TooManyMarinesInOneChapterException();
+            }
         }
-
         spaceRepository.save(spaceMarine);
         EditSpaceMarine editSpaceMarine = new EditSpaceMarine();
         editSpaceMarine.setSpaceMarine(spaceMarine);
@@ -68,7 +69,7 @@ public class SpaceService {
     }
 
     @Transactional(rollbackFor = {IncorrectValueException.class, ChapterException.class, CoordinatesException.class,
-            TooManyMarinesInOneChapterException.class, MarineException.class}, isolation = Isolation.SERIALIZABLE)
+            TooManyMarinesInOneChapterException.class, MarineException.class}, isolation = Isolation.SERIALIZABLE, propagation = Propagation.MANDATORY)
     public void addListOfNewSpaceMarines(List<SpaceMarine> spaceMarineList) throws IncorrectValueException,
             CoordinatesException, ChapterException, TooManyMarinesInOneChapterException, MarineException {
         for (SpaceMarine spaceMarine : spaceMarineList) {

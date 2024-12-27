@@ -126,7 +126,7 @@ public class ChapterController {
         if (chapters != null) {
             chapters.forEach(chapter -> {
                 chapter.setSpaceMarines(null);
-                System.out.println(chapter.getUser().toString());
+//                System.out.println(chapter.getUser().toString());
                 chapter.getUser().setPassword(null);
 //                chapter.getUser().setId(null);
                 chapter.getUser().setCoordinates(null);
